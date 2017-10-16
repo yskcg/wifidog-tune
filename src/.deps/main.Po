@@ -1,0 +1,87 @@
+main.o: main.c gateway.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/stdio.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/features.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/uClibc_config.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/sys/cdefs.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../lib/gcc/arm-linux-uclibceabi/4.7.1/include/stddef.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/types.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/wordsize.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/typesizes.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/uClibc_stdio.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/wchar.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/wchar.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/pthreadtypes.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/endian.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/endian.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/byteswap.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/byteswap.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/byteswap-common.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../lib/gcc/arm-linux-uclibceabi/4.7.1/include/stdarg.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/stdio_lim.h \
+ ../libhttpd/httpd.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/sys/time.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/time.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/time.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/sys/select.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/select.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/sigset.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/sys/types.h \
+ /opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/sys/sysmacros.h
+
+gateway.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/stdio.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/features.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/uClibc_config.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/sys/cdefs.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../lib/gcc/arm-linux-uclibceabi/4.7.1/include/stddef.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/types.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/wordsize.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/typesizes.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/uClibc_stdio.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/wchar.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/wchar.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/pthreadtypes.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/endian.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/endian.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/byteswap.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/byteswap.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/byteswap-common.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../lib/gcc/arm-linux-uclibceabi/4.7.1/include/stdarg.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/stdio_lim.h:
+
+../libhttpd/httpd.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/sys/time.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/time.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/time.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/sys/select.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/select.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/bits/sigset.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/sys/types.h:
+
+/opt/RTOS/V100R005C00/armA9le_3.10_ek_micro/gnu/bin/../arm-linux-uclibceabi/libc/usr/include/sys/sysmacros.h:
