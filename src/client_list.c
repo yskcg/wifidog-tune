@@ -122,7 +122,7 @@ static void generate_ip_nat_port_range(const char *ip,char *nat_port_range)
 	nat_port_start = ip_dlow + 32768;
 	nat_port_end = nat_port_start +100;
 	
-	sprintf(nat_port_range,"%d-%d\n",nat_port_start,nat_port_end);
+	sprintf(nat_port_range,"%d-%d",nat_port_start,nat_port_end);
 }
 
 /** Based on the parameters it receives, this function creates a new entry
@@ -172,7 +172,7 @@ client_list_add(const char *ip, const char *mac, const char *token, const char *
 		sprintf(shell_cmd,"touch /tmp/gram/apstatus/on_off_line/%u_1.log",htonl(addr.s_addr));
 		debug(LOG_INFO,"IP ADDRESS IS :0x%x 0x%x %s\n",addr.s_addr,htonl(addr.s_addr),shell_cmd);
 		system(shell_cmd);
-		sprintf(logon_file,"auth_mode=4\r\naccount=%s\r\nip_type=4\r\nip=%s\r\nuser_mac=%s\r\nonoff_flag=1\r\nonoff_time=%d\r\nnat_port=%s\r\nfield_intensity=\r\n",\
+		sprintf(logon_file,"auth_mode=4\r\naccount=%s\r\nip_type=4\r\nip=%s\r\nuser_mac=%s\r\nonoff_flag=1\r\nonoff_time=%d\r\nnat_port=%s\r\nfield_strength=\r\n",\
 				curclient->uid,curclient->ip,curclient->mac,curclient->logon_time,nat_port_range);
 
 		debug(LOG_INFO,"account:%s ip:%s user_mac:%s logon_time:%d nat_port:%s\n",curclient->uid,curclient->ip,curclient->mac,curclient->logon_time,nat_port_range);
