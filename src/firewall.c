@@ -127,7 +127,7 @@ fw_deny(t_client * client)
 
 	/*generate the logoff file*/
 	/*add the logoff timestamp*/
-	client->logoff_time = (long)time(NULL) -28800;
+	client->logoff_time = (long)time(NULL);
 	
 	/*generate the logon file*/
 
@@ -316,7 +316,7 @@ fw_sync_with_authserver(void)
                                 p1->counters.outgoing, p1->counters.incoming_delta, p1->counters.outgoing_delta);
         }
 
-        time_t current_time = time(NULL);
+        time_t current_time = (long)time(NULL);
         debug(LOG_INFO,
               "Checking client %s for timeout:  Last updated %ld (%ld seconds ago), timeout delay %ld seconds, current time %ld, ",
               p1->ip, p1->counters.last_updated, current_time - p1->counters.last_updated,

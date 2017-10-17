@@ -154,12 +154,12 @@ client_list_add(const char *ip, const char *mac, const char *token, const char *
     curclient->counters.incoming_delta = curclient->counters.outgoing_delta = 
             curclient->counters.incoming = curclient->counters.incoming_history = curclient->counters.outgoing =
         curclient->counters.outgoing_history = 0;
-    curclient->counters.last_updated = time(NULL);
+    curclient->counters.last_updated = (long)time(NULL);
 	
 	/*add the uid*/
 	memcpy(curclient->uid,uid,strlen(uid));
 	/*add the logon timestamp*/
-	curclient->logon_time = (long)time(NULL) - 28800;
+	curclient->logon_time = (long)time(NULL);
 	/*make the nat port range*/
 	generate_ip_nat_port_range(ip,nat_port_range);
 

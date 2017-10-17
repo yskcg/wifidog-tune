@@ -404,7 +404,7 @@ int get_device_info()
 	close(fd);
 
 	/*generate the gw_id*/
-	sprintf(config->gw_id,"FH_%s_%s",config->device_sn,config->device_base_mac);
+	sprintf(config->gw_id,"RZX_%s_%s",config->device_sn,config->device_base_mac);
 
 	debug(LOG_DEBUG, "%s %d gw_id:%s\n",__FUNCTION__,__LINE__,config->gw_id);
 	return 0;
