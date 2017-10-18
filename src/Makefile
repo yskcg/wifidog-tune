@@ -321,7 +321,6 @@ top_srcdir = ..
 noinst_LIBRARIES = libgateway.a
 AM_CPPFLAGS = \
 	-I${top_srcdir}/libhttpd/ \
-	-DSYSCONFDIR='"$(sysconfdir)"' \
 	-Wall \
 	-Wextra \
 	-Wno-unused-parameter

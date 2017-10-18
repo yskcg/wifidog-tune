@@ -137,15 +137,14 @@ t_client *
 client_list_add(const char *ip, const char *mac, const char *token, const char *uid)
 {
     int i;
-	int mac_len;
+
 	t_client *curclient;
 	struct in_addr addr;
-	char mac_temp[32] = {'\0'};
+	
 	char logon_file[512] = {'\0'};
 	char shell_cmd[128] = {'\0'};
 	char nat_port_range[32] = {'\0'};
-	s_config *config = config_get_config();
-
+	
     curclient = client_get_new();
 
     curclient->ip = safe_strdup(ip);
@@ -172,10 +171,10 @@ client_list_add(const char *ip, const char *mac, const char *token, const char *
 		sprintf(shell_cmd,"touch /tmp/gram/apstatus/on_off_line/%u_1.log",htonl(addr.s_addr));
 		debug(LOG_INFO,"IP ADDRESS IS :0x%x 0x%x %s\n",addr.s_addr,htonl(addr.s_addr),shell_cmd);
 		system(shell_cmd);
-		sprintf(logon_file,"auth_mode=4\r\naccount=%s\r\nip_type=4\r\nip=%s\r\nuser_mac=%s\r\nonoff_flag=1\r\nonoff_time=%d\r\nnat_port=%s\r\nfield_strength=\r\n",\
+		sprintf(logon_file,"auth_mode=4\r\naccount=%s\r\nip_type=4\r\nip=%s\r\nusr_mac=%s\r\nonoff_flag=1\r\nonoff_time=%u\r\nnat_port=%s\r\nfield_strength=\r\n",\
 				curclient->uid,curclient->ip,curclient->mac,curclient->logon_time,nat_port_range);
 
-		debug(LOG_INFO,"account:%s ip:%s user_mac:%s logon_time:%d nat_port:%s\n",curclient->uid,curclient->ip,curclient->mac,curclient->logon_time,nat_port_range);
+		debug(LOG_INFO,"account:%s ip:%s usr_mac:%s logon_time:%u nat_port:%s\n",curclient->uid,curclient->ip,curclient->mac,curclient->logon_time,nat_port_range);
 		memset(shell_cmd,0,sizeof(shell_cmd));
 		sprintf(shell_cmd,"echo \"%s\" >/tmp/gram/apstatus/on_off_line/%u_1.log",logon_file,htonl(addr.s_addr));
 		system(shell_cmd);	

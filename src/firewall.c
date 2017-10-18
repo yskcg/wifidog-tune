@@ -135,7 +135,7 @@ fw_deny(t_client * client)
 	system("mkdir -p /tmp/gram/apstatus/on_off_line/");
 	sprintf(shell_cmd,"touch /tmp/gram/apstatus/on_off_line/%u_0.log",htonl(addr.s_addr));
 	system(shell_cmd);
-	sprintf(logoff_file,"auth_mode=4\r\naccount=%s\r\nip_type=4\r\nip=%s\r\nuser_mac=%s\r\nonoff_flag=0\r\nonoff_time=%d\r\nonline_time=%d\r\nupload=0\r\ndownload=0\r\n",\
+	sprintf(logoff_file,"auth_mode=4\r\naccount=%s\r\nip_type=4\r\nip=%s\r\nusr_mac=%s\r\nonoff_flag=0\r\nonoff_time=%d\r\nonline_time=%d\r\nupload=0\r\ndownload=0\r\n",\
 			client->uid,client->ip,client->mac,client->logoff_time,client->logoff_time - client->logon_time);
 
 	memset(shell_cmd,0,sizeof(shell_cmd));
