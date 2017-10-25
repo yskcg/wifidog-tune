@@ -221,6 +221,34 @@ iptables_load_ruleset(const char *table, const char *ruleset, const char *chain)
     debug(LOG_DEBUG, "Ruleset %s loaded into table %s, chain %s", ruleset, table, chain);
 }
 
+void iptables_fw_set_white_list(const char * mac)
+{
+	if(mac == NULL){
+		return ;
+	}
+
+	iptables_do_command("-t nat -A " CHAIN_WHITE_MAC_LIST "-m mac --mac-source %s -j ACCEPT", mac);
+}
+
+void iptables_fw_clear_white_list(void)
+{
+	 iptables_do_command("-t nat -F " CHAIN_WHITE_MAC_LIST);
+}
+
+void iptables_fw_clear_black_list(void)
+{
+	 iptables_do_command("-t nat -F " CHAIN_BLACK_MAC_LIST);
+}
+
+void iptables_fw_set_black_list(const char * mac)
+{
+	if(mac == NULL){
+		return ;
+	}
+
+	iptables_do_command("-t nat -A " CHAIN_BLACK_MAC_LIST "-m mac --mac-source %s -j DNAT --to-destination 0.0.0.0", mac);
+}
+
 void
 iptables_fw_clear_authservers(void)
 {
@@ -306,6 +334,9 @@ iptables_fw_init(void)
     iptables_do_command("-t nat -N " CHAIN_OUTGOING);
     iptables_do_command("-t nat -N " CHAIN_TO_ROUTER);
     iptables_do_command("-t nat -N " CHAIN_TO_INTERNET);
+	iptables_do_command("-t nat -N " CHAIN_BLACK_MAC_LIST);
+	iptables_do_command("-t nat -N " CHAIN_WHITE_MAC_LIST);
+
     iptables_do_command("-t nat -N " CHAIN_GLOBAL);
     iptables_do_command("-t nat -N " CHAIN_UNKNOWN);
     iptables_do_command("-t nat -N " CHAIN_AUTHSERVERS);
@@ -317,6 +348,10 @@ iptables_fw_init(void)
 
     iptables_do_command("-t nat -A " CHAIN_OUTGOING " -d %s -j " CHAIN_TO_ROUTER, config->gw_address);
     iptables_do_command("-t nat -A " CHAIN_TO_ROUTER " -j ACCEPT");
+
+	/*support for mac list black list and white list*/
+	iptables_do_command("-t nat -A " CHAIN_OUTGOING " -j " CHAIN_BLACK_MAC_LIST);
+	iptables_do_command("-t nat -A " CHAIN_OUTGOING " -j " CHAIN_WHITE_MAC_LIST);
 
     iptables_do_command("-t nat -A " CHAIN_OUTGOING " -j " CHAIN_TO_INTERNET);
 

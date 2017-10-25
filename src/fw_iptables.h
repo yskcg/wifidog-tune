@@ -36,6 +36,9 @@
 /**Iptable chain names used by WifiDog */
 #define CHAIN_OUTGOING  "WD_$ID$_Outgoing"
 #define CHAIN_TO_INTERNET "WD_$ID$_Internet"
+#define CHAIN_BLACK_MAC_LIST "WD_$ID_black_macaddr_list"
+#define CHAIN_WHITE_MAC_LIST "WD_$ID_white_macaddr_list"
+
 #define CHAIN_TO_ROUTER "WD_$ID$_Router"
 #define CHAIN_INCOMING  "WD_$ID$_Incoming"
 #define CHAIN_AUTHSERVERS "WD_$ID$_AuthServs"  /* Longest chain, 13 chars ecluding ID */
@@ -56,6 +59,14 @@ typedef enum fw_access_t_ {
 
 /** @brief Initialize the firewall */
 int iptables_fw_init(void);
+
+/** @brief Clear the white black list */
+void iptables_fw_clear_white_list(void);
+void iptables_fw_clear_black_list(void);
+
+/** @brief Set the white black list */
+void iptables_fw_set_black_list(const char * mac);
+void iptables_fw_set_white_list(const char * mac);
 
 /** @brief Initializes the authservers table */
 void iptables_fw_set_authservers(void);
