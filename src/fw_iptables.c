@@ -496,6 +496,8 @@ iptables_fw_destroy(void)
     iptables_do_command("-t nat -F " CHAIN_TO_INTERNET);
     iptables_do_command("-t nat -F " CHAIN_GLOBAL);
     iptables_do_command("-t nat -F " CHAIN_UNKNOWN);
+	iptables_do_command("-t nat -F " CHAIN_BLACK_MAC_LIST);
+	iptables_do_command("-t nat -F " CHAIN_WHITE_MAC_LIST);
     iptables_do_command("-t nat -X " CHAIN_AUTHSERVERS);
     iptables_do_command("-t nat -X " CHAIN_OUTGOING);
     if (got_authdown_ruleset)
@@ -504,6 +506,8 @@ iptables_fw_destroy(void)
     iptables_do_command("-t nat -X " CHAIN_TO_INTERNET);
     iptables_do_command("-t nat -X " CHAIN_GLOBAL);
     iptables_do_command("-t nat -X " CHAIN_UNKNOWN);
+	iptables_do_command("-t nat -X " CHAIN_BLACK_MAC_LIST);
+	iptables_do_command("-t nat -X " CHAIN_WHITE_MAC_LIST);
 
     /*
      *

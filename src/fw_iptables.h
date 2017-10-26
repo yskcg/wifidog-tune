@@ -36,8 +36,8 @@
 /**Iptable chain names used by WifiDog */
 #define CHAIN_OUTGOING  "WD_$ID$_Outgoing"
 #define CHAIN_TO_INTERNET "WD_$ID$_Internet"
-#define CHAIN_BLACK_MAC_LIST "WD_$ID_black_macaddr_list"
-#define CHAIN_WHITE_MAC_LIST "WD_$ID_white_macaddr_list"
+#define CHAIN_BLACK_MAC_LIST "WD_$ID$_black_macaddr_list"
+#define CHAIN_WHITE_MAC_LIST "WD_$ID$_white_macaddr_list"
 
 #define CHAIN_TO_ROUTER "WD_$ID$_Router"
 #define CHAIN_INCOMING  "WD_$ID$_Incoming"

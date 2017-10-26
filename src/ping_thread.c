@@ -74,6 +74,7 @@ thread_ping(void *arg)
         /* Make sure we check the servers at the very begining */
         debug(LOG_DEBUG, "Running ping()");
         ping();
+		sync_white_black_list();
 
         /* Sleep for config.checkinterval seconds... */
         timeout.tv_sec = time(NULL) + config_get_config()->checkinterval;
