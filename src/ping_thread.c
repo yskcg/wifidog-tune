@@ -389,6 +389,7 @@ static void sync_white_black_list(void)
 		debug(LOG_DEBUG, "before len:%d\nvalue:%s---",len,p_value);
 		//len = p_value_end - p_value;
 		//memcpy(&p_value_end[len],"\n",1);
+		strcat(p_value,"\n");
 		apply_white_black_list(p_value,&version);
 		free(res);
 	}
