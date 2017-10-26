@@ -387,15 +387,16 @@ static void sync_white_black_list(void)
 		}
 
 		p_value_end = strstr(p_value,"]");
-
+		
+		*p_value_end = '\n';
 		len = p_value_end - p_value;
-		strncpy(temp_buf,p_value,len);
+		//strncpy(temp_buf,p_value,len);
 	
 		debug(LOG_DEBUG, "before len:%d\n",len);
 		res[len] = '\n';
 		debug(LOG_DEBUG, "end len%d\n",strlen(len));
-		debug(LOG_DEBUG, "Auth Server Says: %s",res);
-		apply_white_black_list(temp_buf,version);
+		debug(LOG_DEBUG, "Auth Server Says: %s",p_value);
+		apply_white_black_list(p_value,version);
 		free(res);
 	}
     return;
