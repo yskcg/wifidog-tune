@@ -56,6 +56,7 @@
 #include "gateway.h"
 #include "simple_http.h"
 
+static int version = 0;
 static void ping(void);
 static void sync_white_black_list(void);
 
@@ -225,7 +226,7 @@ static int is_mac(char *mac_addr)
 
 }
 
-static void apply_white_black_list(char *buf,int version)
+static void apply_white_black_list(char *buf,char* version)
 {
 	char *p_key_value = NULL;
 	char *p_key_value_end = NULL;
@@ -249,11 +250,12 @@ static void apply_white_black_list(char *buf,int version)
 		//printf("%s--%d\n",p_key_value+1,p_key_value_end-p_key_value);
 		strncpy(string_version,p_key_value+1,p_key_value_end-p_key_value -1);
 		server_version = atoi(string_version);
-		//printf("version=%d\n",server_version);
+		debug(LOG_DEBUG,"serversion=%d,localversion=%d\n",server_version,version);
 
-		if(version == server_version || server_version == 0 || version == 0 ){
+		if(version == server_version || server_version == 0 ){
 			return;
 		}else{
+			*version = server_version;
 			while(strlen(p_key_value_end) > 0){
 				memset(key,'\0',sizeof(key));
 				memset(value ,'\0',sizeof(value));
@@ -334,7 +336,6 @@ static void sync_white_black_list(void)
     float sys_load = 0;
     t_auth_serv *auth_server = NULL;
     auth_server = get_auth_server();
-    static int version = 0;
 	char *p_value = NULL;
 
     debug(LOG_DEBUG, "Entering sync white black list");
@@ -387,7 +388,7 @@ static void sync_white_black_list(void)
 		debug(LOG_DEBUG, "before len:%d\nvalue:%s---",len,p_value);
 		//len = p_value_end - p_value;
 		//memcpy(&p_value_end[len],"\n",1);
-		apply_white_black_list(p_value,version);
+		apply_white_black_list(p_value,&version);
 		free(res);
 	}
     return;
