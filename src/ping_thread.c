@@ -335,7 +335,7 @@ static void sync_white_black_list(void)
     t_auth_serv *auth_server = NULL;
     auth_server = get_auth_server();
     static int version = 0;
-	char temp_buf[1024] = '\0';
+	char temp_buf[1024] = {'\0'};
 	char *p_value = NULL;
 	char *p_value_end = NULL;
 
