@@ -218,7 +218,6 @@ static int is_mac(char *mac_addr)
 		return 0;
 	}
 
-	printf("len of mac:%d\n",mac_addr);
 	if(strlen(mac_addr) <17){
 		return 0;
 	}else{
