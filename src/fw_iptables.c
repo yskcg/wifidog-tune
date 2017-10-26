@@ -227,7 +227,7 @@ void iptables_fw_set_white_list(const char * mac)
 		return ;
 	}
 
-	iptables_do_command("-t nat -A " CHAIN_WHITE_MAC_LIST "-m mac --mac-source %s -j ACCEPT", mac);
+	iptables_do_command("-t nat -A " CHAIN_WHITE_MAC_LIST " -m mac --mac-source %s -j ACCEPT", mac);
 }
 
 void iptables_fw_clear_white_list(void)
@@ -246,7 +246,7 @@ void iptables_fw_set_black_list(const char * mac)
 		return ;
 	}
 
-	iptables_do_command("-t nat -A " CHAIN_BLACK_MAC_LIST "-m mac --mac-source %s -j DNAT --to-destination 0.0.0.0", mac);
+	iptables_do_command("-t nat -A " CHAIN_BLACK_MAC_LIST " -m mac --mac-source %s -j DNAT --to-destination 0.0.0.0", mac);
 }
 
 void
