@@ -388,8 +388,9 @@ static void sync_white_black_list(void)
 
 		p_value_end = strstr(p_value,"]");
 		
-		*p_value_end = '\n';
+		*p_value_end = '\0';
 		len = p_value_end - p_value;
+		memcpy(&p_value_end[len],"\n",1);
 		//strncpy(temp_buf,p_value,len);
 	
 		debug(LOG_DEBUG, "before len:%d\n",len);
