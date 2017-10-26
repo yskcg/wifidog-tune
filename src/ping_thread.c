@@ -276,7 +276,7 @@ static void apply_white_black_list(char *buf,char* version)
 					break;
 				}
 				strncpy(value,p_key_value,p_key_value_end-p_key_value);
-				//printf("%s=%s value_len=%d\n",key,value,strlen(value));
+				debug(LOG_DEBUG, "%s=%s value_len=%d\n",key,value,strlen(value));
 
 				/*Flash the iptables white black list*/
 				if(strcmp(key,"blacklist") ==0){
