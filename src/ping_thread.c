@@ -278,11 +278,11 @@ static void apply_white_black_list(char *buf,int version)
 				/*Flash the iptables white black list*/
 				if(strcmp(key,"blacklist") ==0){
 					iptables_fw_clear_black_list();
-					printf("iptables -t nat -F blacklist\n");
+					debug(LOG_DEBUG, "iptables -t nat -F blacklist\n");
 					white_black_flag = 1;
 				}else if(strcmp(key,"whitelist") ==0 ){
 					iptables_fw_clear_white_list();
-					printf("iptables -t nat -F whitelist\n");
+					debug(LOG_DEBUG, "iptables -t nat -F whitelist\n");
 					white_black_flag = 0;
 				}
 				/*parse the value*/
@@ -292,7 +292,7 @@ static void apply_white_black_list(char *buf,int version)
 
 					if(p_mac == NULL){
 						if(ismac(p_value)){
-							printf("Add %s to %s\n",p_value,key);
+							debug(LOG_DEBUG, "Add %s to %s\n",p_value,key);
 							if(white_black_flag == 0){
 								iptables_fw_set_white_list((const char *) p_value);
 							}else if(white_black_flag == 1){
@@ -308,7 +308,7 @@ static void apply_white_black_list(char *buf,int version)
 						p_value = p_mac;
 						//printf("p_value:%s\n",p_value);
 						if(ismac(p_value)){
-							printf("Add %s to %s\n",mac,key);
+							debug(LOG_DEBUG, "Add %s to %s\n",mac,key);
 							if(white_black_flag == 0){
 								iptables_fw_set_white_list((const char *) mac);
 							}else if(white_black_flag == 1){
