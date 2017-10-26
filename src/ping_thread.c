@@ -377,9 +377,9 @@ static void sync_white_black_list(void)
 		return ;
     }else{
 		len = strlen(res);
-		debug(LOG_DEBUG, "len%d\n",len);
+		debug(LOG_DEBUG, "before len:%d\n",len);
 		res[len] = '\n';
-		debug(LOG_DEBUG, "len%d\n",strlen(len));
+		debug(LOG_DEBUG, "end len%d\n",strlen(len));
 		debug(LOG_DEBUG, "Auth Server Says: %s",res);
 		apply_white_black_list(res,version);
 		free(res);
