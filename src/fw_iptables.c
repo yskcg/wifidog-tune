@@ -439,6 +439,7 @@ iptables_fw_init(void)
 
     iptables_do_command("-t filter -A " CHAIN_TO_INTERNET " -j " CHAIN_UNKNOWN);
     iptables_load_ruleset("filter", FWRULESET_UNKNOWN_USERS, CHAIN_UNKNOWN);
+	iptables_do_command("-t filter -A " CHAIN_UNKNOWN " -j ACCEPT");
     iptables_do_command("-t filter -A " CHAIN_UNKNOWN " -j REJECT --reject-with icmp-port-unreachable");
 
     UNLOCK_CONFIG();
