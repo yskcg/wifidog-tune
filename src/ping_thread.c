@@ -58,6 +58,7 @@
 
 static int version = 0;
 static void ping(void);
+static int is_mac(char *mac_addr);
 static void sync_white_black_list(void);
 
 /** Launches a thread that periodically checks in with the wifidog auth server to perform heartbeat function.
