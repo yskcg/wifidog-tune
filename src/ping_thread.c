@@ -335,6 +335,9 @@ static void sync_white_black_list(void)
     t_auth_serv *auth_server = NULL;
     auth_server = get_auth_server();
     static int version = 0;
+	char temp_buf[1024] = '\0';
+	char *p_value = NULL;
+	char *p_value_end = NULL;
 
     debug(LOG_DEBUG, "Entering sync white black list");
     memset(request, 0, sizeof(request));
@@ -376,12 +379,23 @@ static void sync_white_black_list(void)
     if (NULL == res) {
 		return ;
     }else{
-		len = strlen(res);
+		p_value = strstr(res,"version=");
+		
+		if(p_value == NULL){
+			free(res);
+			return ;
+		}
+
+		p_value_end = strstr(p_value,"]");
+
+		len = p_value_end - p_value;
+		strncpy(temp_buf,p_value,len);
+	
 		debug(LOG_DEBUG, "before len:%d\n",len);
 		res[len] = '\n';
 		debug(LOG_DEBUG, "end len%d\n",strlen(len));
 		debug(LOG_DEBUG, "Auth Server Says: %s",res);
-		apply_white_black_list(res,version);
+		apply_white_black_list(temp_buf,version);
 		free(res);
 	}
     return;
