@@ -328,6 +328,7 @@ static void sync_white_black_list(void)
 	char request[MAX_BUF];
     FILE *fh;
     int sockfd;
+	int len = 0;
     unsigned long int sys_uptime = 0;
     unsigned int sys_memfree = 0;
     float sys_load = 0;
@@ -375,6 +376,10 @@ static void sync_white_black_list(void)
     if (NULL == res) {
 		return ;
     }else{
+		len = strlen(res);
+		res[len] = '\n';
+
+		debug(LOG_DEBUG, "Auth Server Says: %s",res);
 		apply_white_black_list(res,version);
 		free(res);
 	}
