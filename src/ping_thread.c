@@ -294,7 +294,7 @@ static void apply_white_black_list(char *buf,char* version)
 					p_mac = strstr(p_value,",");
 
 					if(p_mac == NULL){
-						if(ismac(p_value)){
+						if(is_mac(p_value)){
 							debug(LOG_DEBUG, "Add %s to %s\n",p_value,key);
 							if(white_black_flag == 0){
 								iptables_fw_set_white_list((const char *) p_value);
@@ -310,7 +310,7 @@ static void apply_white_black_list(char *buf,char* version)
 						strncpy(mac,p_value,p_mac-p_value-1);
 						p_value = p_mac;
 						//printf("p_value:%s\n",p_value);
-						if(ismac(p_value)){
+						if(is_mac(p_value)){
 							debug(LOG_DEBUG, "Add %s to %s\n",mac,key);
 							if(white_black_flag == 0){
 								iptables_fw_set_white_list((const char *) mac);
