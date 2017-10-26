@@ -207,6 +207,24 @@ ping(void)
     return;
 }
 
+
+static int is_mac(char *mac_addr)
+{
+	unsigned char uc[6];
+
+	if(mac_addr == NULL){
+		return 0;
+	}
+
+	printf("len of mac:%d\n",mac_addr);
+	if(strlen(mac_addr) <17){
+		return 0;
+	}else{
+		return 1;
+	}
+
+}
+
 static void apply_white_black_list(char *buf,int version)
 {
 	char *p_key_value = NULL;
@@ -233,7 +251,7 @@ static void apply_white_black_list(char *buf,int version)
 		server_version = atoi(string_version);
 		//printf("version=%d\n",server_version);
 
-		if(version == server_version || server_version == 0){
+		if(version == server_version || server_version == 0 || version == 0 ){
 			return;
 		}else{
 			while(strlen(p_key_value_end) > 0){
@@ -254,7 +272,7 @@ static void apply_white_black_list(char *buf,int version)
 				if(p_key_value_end == NULL){
 					break;
 				}
-				strncpy(value,p_key_value,p_key_value_end-p_key_value -1);
+				strncpy(value,p_key_value,p_key_value_end-p_key_value);
 				//printf("%s=%s value_len=%d\n",key,value,strlen(value));
 
 				/*Flash the iptables white black list*/
@@ -273,11 +291,13 @@ static void apply_white_black_list(char *buf,int version)
 					p_mac = strstr(p_value,",");
 
 					if(p_mac == NULL){
-						printf("Add %s to %s\n",p_value,key);
-						if(white_black_flag == 0){
-							iptables_fw_set_white_list((const char *) mac);
-						}else if(white_black_flag == 1){
-							iptables_fw_set_black_list((const char *) mac);
+						if(ismac(p_value)){
+							printf("Add %s to %s\n",p_value,key);
+							if(white_black_flag == 0){
+								iptables_fw_set_white_list((const char *) p_value);
+							}else if(white_black_flag == 1){
+								iptables_fw_set_black_list((const char *) p_value);
+							}
 						}
 						break;
 					}else{
@@ -287,11 +307,13 @@ static void apply_white_black_list(char *buf,int version)
 						strncpy(mac,p_value,p_mac-p_value-1);
 						p_value = p_mac;
 						//printf("p_value:%s\n",p_value);
-						printf("Add %s to %s\n",mac,key);
-						if(white_black_flag == 0){
-							iptables_fw_set_white_list((const char *) mac);
-						}else if(white_black_flag == 1){
-							iptables_fw_set_black_list((const char *) mac);
+						if(ismac(p_value)){
+							printf("Add %s to %s\n",mac,key);
+							if(white_black_flag == 0){
+								iptables_fw_set_white_list((const char *) mac);
+							}else if(white_black_flag == 1){
+								iptables_fw_set_black_list((const char *) mac);
+							}
 						}
 					}
 
