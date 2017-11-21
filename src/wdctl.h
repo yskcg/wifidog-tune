@@ -27,7 +27,7 @@
 #ifndef _WDCTL_H_
 #define _WDCTL_H_
 
-#define DEFAULT_SOCK	"/var/wdctl.sock"
+#define DEFAULT_SOCK	"/tmp/wdctl.sock"
 
 #define WDCTL_UNDEF		0
 #define WDCTL_STATUS		1
