@@ -208,14 +208,14 @@ int port;
     new = malloc(sizeof(httpd));
     if (new == NULL)
         return (NULL);
-    bzero(new, sizeof(httpd));
+	memset(new,0,sizeof(httpd));
     new->port = port;
     if (host == HTTP_ANY_ADDR)
         new->host = HTTP_ANY_ADDR;
     else
         new->host = strdup(host);
     new->content = (httpDir *) malloc(sizeof(httpDir));
-    bzero(new->content, sizeof(httpDir));
+    memset(new->content,0, sizeof(httpDir));
     new->content->name = strdup("");
 
     /*
