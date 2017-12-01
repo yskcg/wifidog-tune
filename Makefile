@@ -48,5 +48,21 @@ ECHO:
 $(clean_dirs):
 	$(MAKE) -C $(patsubst _clean_%,%,$@) clean
 
+$(SUBDIRS):ECHO
+	$(MAKE) -C $@ linux
+
+ECHO:
+	@echo $(SUBDIRS)
+
+#clean: $(dirs)
+#	rm -rf bin include
+#	for clean_target in $(dirs);
+#	do
+#	cd $@ && $(MAKE) clean \
+#	done
+
+$(clean_dirs):
+	$(MAKE) -C $(patsubst _clean_%,%,$@) clean
+
 clean: $(clean_dirs)    
 	
