@@ -33,4 +33,5 @@
 /** @brief Periodically checks on the auth server to see if it's alive. */
 void thread_ping(void *arg);
 
+int is_mac(char *mac_addr);
 #endif

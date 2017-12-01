@@ -27,6 +27,8 @@
 ** function prototypes and c++ inclusion
 */
 
+#include "httpd.h"
+
 #ifndef LIB_HTTPD_PRIV_H
 
 #define LIB_HTTPD_H_PRIV 1
