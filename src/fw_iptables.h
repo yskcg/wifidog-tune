@@ -29,13 +29,14 @@
 #define _FW_IPTABLES_H_
 
 #include "firewall.h"
+#include "ping_thread.h"
 
 #define CHAIN_NAME_MAX_LEN 15  /* 28 (actual max) - 13 (AuthServers chain fixed part. */
 
 /*@{*/
 /**Iptable chain names used by WifiDog */
 #define CHAIN_OUTGOING  "WD_$ID$_Outgoing"
-#define CHAIN_TO_INTERNET "WD_$ID$_Internet"
+#define CHAIN_TO_INTERNET "WD_$ID$_Auth_list"
 #define CHAIN_BLACK_MAC_LIST "WD_$ID$_black_macaddr_list"
 #define CHAIN_WHITE_MAC_LIST "WD_$ID$_white_macaddr_list"
 
