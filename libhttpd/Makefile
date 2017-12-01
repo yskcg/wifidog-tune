@@ -17,6 +17,8 @@ MYLDFLAGS = -Wall -Wextra -Wno-unused-parameter
 EXTRA_CFLAGS +=
 MYLIBS=
 DEFS = -DHAVE_CONFIG_H
+
+
 top_builddir = ..
 DEFAULT_INCLUDES = -I. -I$(top_builddir)
 
