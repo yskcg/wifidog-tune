@@ -247,9 +247,9 @@ static void apply_white_black_list(char *buf,char* version)
 		//printf("%s--%d\n",p_key_value+1,p_key_value_end-p_key_value);
 		strncpy(string_version,p_key_value+1,p_key_value_end-p_key_value -1);
 		server_version = atoi(string_version);
-		debug(LOG_DEBUG,"serversion=%d,localversion=%d\n",server_version,version);
+		debug(LOG_DEBUG,"serversion=%d,localversion=%d\n",server_version,*version);
 
-		if(version == server_version || server_version == 0 ){
+		if(*version == server_version || server_version == 0 ){
 			return;
 		}else{
 			*version = server_version;
