@@ -287,11 +287,6 @@ fw_sync_with_authserver(void)
     t_client *p1, *p2, *worklist, *tmp;
     s_config *config = config_get_config();
 
-    if (-1 == iptables_fw_counters_update()) {
-        debug(LOG_ERR, "Could not get counters from firewall!");
-        return;
-    }
-
     LOCK_CLIENT_LIST();
 
     /* XXX Ideally, from a thread safety PoV, this function should build a list of client pointers,
@@ -321,93 +316,80 @@ fw_sync_with_authserver(void)
               "Checking client %s for timeout:  Last updated %ld (%ld seconds ago), timeout delay %ld seconds, current time %ld, ",
               p1->ip, p1->counters.last_updated, current_time - p1->counters.last_updated,
               config->checkinterval * config->clienttimeout, current_time);
-        if (p1->counters.last_updated + (config->checkinterval * config->clienttimeout) <= current_time) {
-            /* Timing out user */
-            debug(LOG_INFO, "%s - Inactive for more than %ld seconds, removing client and denying in firewall",
-                  p1->ip, config->checkinterval * config->clienttimeout);
-            LOCK_CLIENT_LIST();
-            tmp = client_list_find_by_client(p1);
-            if (NULL != tmp) {
-                logout_client(tmp);
-            } else {
-                debug(LOG_NOTICE, "Client was already removed. Not logging out.");
-            }
-            UNLOCK_CLIENT_LIST();
-        } else {
-            /*
-             * This handles any change in
-             * the status this allows us
-             * to change the status of a
-             * user while he's connected
-             *
-             * Only run if we have an auth server
-             * configured!
-             */
-            LOCK_CLIENT_LIST();
-            tmp = client_list_find_by_client(p1);
-            if (NULL == tmp) {
-                UNLOCK_CLIENT_LIST();
-                debug(LOG_NOTICE, "Client was already removed. Skipping auth processing");
-                continue;       /* Next client please */
-            }
+       
+		/*
+		 * This handles any change in
+		 * the status this allows us
+		 * to change the status of a
+		 * user while he's connected
+		 *
+		 * Only run if we have an auth server
+		 * configured!
+		 */
+		LOCK_CLIENT_LIST();
+		tmp = client_list_find_by_client(p1);
+		if (NULL == tmp) {
+			UNLOCK_CLIENT_LIST();
+			debug(LOG_NOTICE, "Client was already removed. Skipping auth processing");
+			continue;       /* Next client please */
+		}
 
-            if (config->auth_servers != NULL) {
-                switch (authresponse.authcode) {
-                case AUTH_DENIED:
-                    debug(LOG_NOTICE, "%s - Denied. Removing client and firewall rules", tmp->ip);
-                    fw_deny(tmp);
-                    client_list_delete(tmp);
-                    break;
+		if (config->auth_servers != NULL) {
+			switch (authresponse.authcode) {
+			case AUTH_DENIED:
+				debug(LOG_NOTICE, "%s - Denied. Removing client and firewall rules", tmp->ip);
+				fw_deny(tmp);
+				client_list_delete(tmp);
+				break;
 
-                case AUTH_VALIDATION_FAILED:
-                    debug(LOG_NOTICE, "%s - Validation timeout, now denied. Removing client and firewall rules",
-                          tmp->ip);
-                    fw_deny(tmp);
-                    client_list_delete(tmp);
-                    break;
+			case AUTH_VALIDATION_FAILED:
+				debug(LOG_NOTICE, "%s - Validation timeout, now denied. Removing client and firewall rules",
+					  tmp->ip);
+				fw_deny(tmp);
+				client_list_delete(tmp);
+				break;
 
-                case AUTH_ALLOWED:
-                    if (tmp->fw_connection_state != FW_MARK_KNOWN) {
-                        debug(LOG_INFO, "%s - Access has changed to allowed, refreshing firewall and clearing counters",
-                              tmp->ip);
-                        //WHY did we deny, then allow!?!? benoitg 2007-06-21
-                        //fw_deny(tmp->ip, tmp->mac, tmp->fw_connection_state); /* XXX this was possibly to avoid dupes. */
+			case AUTH_ALLOWED:
+				if (tmp->fw_connection_state != FW_MARK_KNOWN) {
+					debug(LOG_INFO, "%s - Access has changed to allowed, refreshing firewall and clearing counters",
+						  tmp->ip);
+					//WHY did we deny, then allow!?!? benoitg 2007-06-21
+					//fw_deny(tmp->ip, tmp->mac, tmp->fw_connection_state); /* XXX this was possibly to avoid dupes. */
 
-                        if (tmp->fw_connection_state != FW_MARK_PROBATION) {
-                            tmp->counters.incoming_delta =
-                             tmp->counters.outgoing_delta =
-                             tmp->counters.incoming =
-                             tmp->counters.outgoing = 0;
-                        } else {
-                            //We don't want to clear counters if the user was in validation, it probably already transmitted data..
-                            debug(LOG_INFO,
-                                  "%s - Skipped clearing counters after all, the user was previously in validation",
-                                  tmp->ip);
-                        }
-                        fw_allow(tmp, FW_MARK_KNOWN);
-                    }
-                    break;
+					if (tmp->fw_connection_state != FW_MARK_PROBATION) {
+						tmp->counters.incoming_delta =
+						 tmp->counters.outgoing_delta =
+						 tmp->counters.incoming =
+						 tmp->counters.outgoing = 0;
+					} else {
+						//We don't want to clear counters if the user was in validation, it probably already transmitted data..
+						debug(LOG_INFO,
+							  "%s - Skipped clearing counters after all, the user was previously in validation",
+							  tmp->ip);
+					}
+					fw_allow(tmp, FW_MARK_KNOWN);
+				}
+				break;
 
-                case AUTH_VALIDATION:
-                    /*
-                     * Do nothing, user
-                     * is in validation
-                     * period
-                     */
-                    debug(LOG_INFO, "%s - User in validation period", tmp->ip);
-                    break;
+			case AUTH_VALIDATION:
+				/*
+				 * Do nothing, user
+				 * is in validation
+				 * period
+				 */
+				debug(LOG_INFO, "%s - User in validation period", tmp->ip);
+				break;
 
-                case AUTH_ERROR:
-                    debug(LOG_WARNING, "Error communicating with auth server - leaving %s as-is for now", tmp->ip);
-                    break;
+			case AUTH_ERROR:
+				debug(LOG_WARNING, "Error communicating with auth server - leaving %s as-is for now", tmp->ip);
+				break;
 
-                default:
-                    debug(LOG_ERR, "I do not know about authentication code %d", authresponse.authcode);
-                    break;
-                }
-            }
-            UNLOCK_CLIENT_LIST();
-        }
+			default:
+				debug(LOG_ERR, "I do not know about authentication code %d", authresponse.authcode);
+				break;
+			}
+		}
+		UNLOCK_CLIENT_LIST();
     }
 
     client_list_destroy(worklist);
