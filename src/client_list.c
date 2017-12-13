@@ -168,7 +168,7 @@ client_list_add(const char *ip, const char *mac, const char *token, const char *
 	if(uid){
 		inet_pton(AF_INET, ip, (void *)&addr);
 		system("mkdir -p /tmp/gram/apstatus/on_off_line/");
-		sprintf(shell_cmd,"touch /tmp/gram/apstatus/on_off_line/%u_1.log",htonl(addr.s_addr));
+		sprintf(shell_cmd,"echo >/tmp/gram/apstatus/on_off_line/%u_1.log",htonl(addr.s_addr));
 		debug(LOG_INFO,"IP ADDRESS IS :0x%x 0x%x %s\n",addr.s_addr,htonl(addr.s_addr),shell_cmd);
 		system(shell_cmd);
 		sprintf(logon_file,"auth_mode=4\r\naccount=%s\r\nip_type=4\r\nip=%s\r\nusr_mac=%s\r\nonoff_flag=1\r\nonoff_time=%u\r\nnat_port=%s\r\nfield_strength=\r\n",\

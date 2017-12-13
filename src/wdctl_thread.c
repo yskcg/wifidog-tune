@@ -258,9 +258,13 @@ static void
 wdctl_stop(int fd)
 {
     pid_t pid;
-
+	//char shell_cmd[64] = {'\0'};
     pid = getpid();
-    kill(pid, SIGINT);
+    kill(pid, SIGQUIT);
+	//sprintf(shell_cmd,"kill %d",pid);
+
+	debug(LOG_NOTICE, "kill wifidog ,pid:%d ",pid);
+	//system(shell_cmd);
 }
 
 static void
