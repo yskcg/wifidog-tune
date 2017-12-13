@@ -1,4 +1,7 @@
-MY_TARGET=mips-unknown-linux-uclibc
+#For zte F663N
+#MY_TARGET=mips-unknown-linux-uclibc
+#For zte F631
+MY_TARGET=arm-linux-uclibc
 export CC=$(MY_TARGET)-gcc
 export AR=$(MY_TARGET)-ar
 export CPP=$(MY_TARGET) -E
