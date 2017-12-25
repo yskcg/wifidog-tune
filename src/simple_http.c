@@ -84,7 +84,6 @@ http_get(const int sockfd, const char *req)
         goto error;
     }
 
-    debug(LOG_DEBUG, "Reading response");
     done = 0;
     do {
         FD_ZERO(&readfds);
@@ -121,7 +120,7 @@ http_get(const int sockfd, const char *req)
 
     close(sockfd);
     retval = pstr_to_string(response);
-    debug(LOG_DEBUG, "HTTP Response from Server: [%s]", retval);
+    //debug(LOG_DEBUG, "HTTP Response from Server: [%s]", retval);
     return retval;
 
  error:

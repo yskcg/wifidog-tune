@@ -29,6 +29,8 @@
 #define _CENTRALSERVER_H_
 
 #include "auth.h"
+#include "http_json.h"
+#include "json_parse.h"
 
 /** @brief Ask the central server to login a client */
 #define REQUEST_TYPE_LOGIN     "login"

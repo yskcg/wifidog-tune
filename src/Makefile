@@ -11,7 +11,8 @@ PKG_BUILD_DIR=$(PWD)
 
 CFLAGS= -O2 -Wall $(MYCFLAGS)  -fPIC $(MYLDFLAGS) $(DEFS) $(DEFAULT_INCLUDES)
 RM= rm -f
-LIBS= -lm -lpthread $(MYLIBS)  -static $(top_dir)/bin/libhttpd.a 
+#-Wl,-Bdynamic -lgcc_s
+LIBS= -static $(top_dir)/bin/libhttpd.a -static $(top_dir)/bin/libjson-c.a -ldl  -lpthread $(MYLIBS) 
 
 MYLDFLAGS = -Wall -Wextra -Wno-unused-parameter
 EXTRA_CFLAGS +=
@@ -22,12 +23,13 @@ DEFAULT_INCLUDES = -I. -I$(top_dir) -I$(top_dir)/include
 # USE_READLINE=1
 
 CORE_O=	main.o auth.o centralserver.o client_list.o commandline.o conf.o debug.o firewall.o fw_iptables.o gateway.o \
-		http.o httpd_thread.o  ping_thread.o pstring.o safe.o simple_http.o util.o  wdctl_thread.o \
+		http.o httpd_thread.o  ping_thread.o pstring.o safe.o simple_http.o util.o  wdctl_thread.o json_parse.o http_json.o md5.o\
 		wd_util.o
 LIB_O=
 
-WIFIDOG_HEADERS=auth.h centralserver.h client_list.h commandline.h common.h conf.h debug.h firewall.h fw_iptables.h \
-				gateway.h httpd_thread.h http.h ping_thread.h pstring.h safe.h simple_http.h util.h wdctl.h wdctl_thread.h wd_util.h
+WIFIDOG_HEADERS=auth.h centralserver.h client_list.h commandline.h common.h conf.h debug.h firewall.h fw_iptables.h json_parse.h \
+				gateway.h httpd_thread.h http.h ping_thread.h pstring.h safe.h simple_http.h util.h wdctl.h wdctl_thread.h wd_util.h \
+				http_json.h md5.h
 
 WIFIDOG= wifidog
 WIFIDOG_O=	$(CORE_O)
@@ -41,19 +43,22 @@ ALL_T= $(WIFIDOG) $(WDCTL)
 
 default: $(PLAT)
 
-all:	$(ALL_T) install
+all:h_install $(ALL_T) install
 
 o:	$(ALL_O)
 
 
 $(WIFIDOG): $(WIFIDOG_O)  $(WIFIDOG_HEADERS)
-	$(CC) -o $@ -L . $(MYLDFLAGS) $(WIFIDOG_O) $(LIBS)
+	@$(CC) -o $@ -L . $(MYLDFLAGS) $(WIFIDOG_O) $(LIBS)
 
 $(WDCTL): $(WDCTL_O) $(WDCTL_HEADERS)
 	$(CC) -o $@ -L . $(MYLDFLAGS) $(WDCTL_O) $(LIBS)
 
 clean:
 	$(RM) $(ALL_T) $(ALL_O)
+
+h_install:$(WIFIDOG_HEADERS)
+	@$(foreach list, $(WIFIDOG_HEADERS),`cp $(list) $(top_builddir)/include`)
 
 install:$(LIBHTTP_HEADERS) $(ALL_SO)
 	@$(foreach list, $(ALL_T),`cp $(list) $(top_builddir)/bin`)
@@ -79,7 +84,7 @@ none:
 	@echo "   $(PLATS)"
 
 linux:
-	$(MAKE) all MYCFLAGS+="-DLUA_USE_LINUX -fPIC $(RFLAG)" MYLIBS="-Wl,-E -ldl $(if $(USE_READLINE), -lreadline -lhistory -lncurses)"
+	$(MAKE) all MYCFLAGS+="-DLUA_USE_LINUX -fPIC $(RFLAG)" 
 
 
 # list targets that do not create files (but not all makes understand .PHONY)

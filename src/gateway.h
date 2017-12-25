@@ -29,8 +29,10 @@
 #define _GATEWAY_H_
 
 #include <stdio.h>
+#include <ctype.h>
 
 #include "httpd.h"
+
 
 extern time_t started_time;
 

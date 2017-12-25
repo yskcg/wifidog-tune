@@ -50,8 +50,6 @@
 #include "client_list.h"
 
 static int iptables_do_command(const char *format, ...);
-static char *iptables_compile(const char *, const char *, const t_firewall_rule *);
-static void iptables_load_ruleset(const char *, const char *, const char *);
 
 /**
 Used to supress the error output of the firewall during destruction */
@@ -126,99 +124,6 @@ iptables_do_command(const char *format, ...)
     free(cmd);
 
     return rc;
-}
-
-/**
- * @internal
- * Compiles a struct definition of a firewall rule into a valid iptables
- * command.
- * @arg table Table containing the chain.
- * @arg chain Chain that the command will be (-A)ppended to.
- * @arg rule Definition of a rule into a struct, from conf.c.
- */
-static char *
-iptables_compile(const char *table, const char *chain, const t_firewall_rule * rule)
-{
-    char command[MAX_BUF], *mode;
-
-    memset(command, 0, MAX_BUF);
-    mode = NULL;
-
-    switch (rule->target) {
-    case TARGET_DROP:
-        if (strncmp(table, "nat", 3) == 0) {
-            free(mode);
-            return NULL;
-        }
-        mode = safe_strdup("DROP");
-        break;
-    case TARGET_REJECT:
-        if (strncmp(table, "nat", 3) == 0) {
-            free(mode);
-            return NULL;
-        }
-        mode = safe_strdup("REJECT");
-        break;
-    case TARGET_ACCEPT:
-        mode = safe_strdup("ACCEPT");
-        break;
-    case TARGET_LOG:
-        mode = safe_strdup("LOG");
-        break;
-    case TARGET_ULOG:
-        mode = safe_strdup("ULOG");
-        break;
-    }
-
-    snprintf(command, sizeof(command), "-t %s -A %s ", table, chain);
-    if (rule->mask != NULL) {
-        if (rule->mask_is_ipset) {
-            snprintf((command + strlen(command)), (sizeof(command) -
-                                                   strlen(command)), "-m set --match-set %s dst ", rule->mask);
-        } else {
-            snprintf((command + strlen(command)), (sizeof(command) - strlen(command)), "-d %s ", rule->mask);
-        }
-    }
-    if (rule->protocol != NULL) {
-        snprintf((command + strlen(command)), (sizeof(command) - strlen(command)), "-p %s ", rule->protocol);
-    }
-    if (rule->port != NULL) {
-        snprintf((command + strlen(command)), (sizeof(command) - strlen(command)), "--dport %s ", rule->port);
-    }
-    snprintf((command + strlen(command)), (sizeof(command) - strlen(command)), "-j %s", mode);
-
-    free(mode);
-
-    /* XXX The buffer command, an automatic variable, will get cleaned
-     * off of the stack when we return, so we strdup() it. */
-    return (safe_strdup(command));
-}
-
-/**
- * @internal
- * Load all the rules in a rule set.
- * @arg ruleset Name of the ruleset
- * @arg table Table containing the chain.
- * @arg chain IPTables chain the rules go into
- */
-static void
-iptables_load_ruleset(const char *table, const char *ruleset, const char *chain)
-{
-    t_firewall_rule *rule;
-    char *cmd;
-
-    debug(LOG_DEBUG, "Load ruleset %s into table %s, chain %s", ruleset, table, chain);
-
-    for (rule = get_ruleset(ruleset); rule != NULL; rule = rule->next) {
-        cmd = iptables_compile(table, chain, rule);
-        if (cmd != NULL) {
-            debug(LOG_DEBUG, "Loading rule \"%s\" into table %s, chain %s", cmd, table, chain);
-            iptables_do_command(cmd);
-        }
-        free(cmd);
-    }
-
-    debug(LOG_DEBUG, "Ruleset %s loaded into table %s, chain %s", ruleset, table, chain);
 }
 
 void iptables_fw_set_white_list(const char * mac)
@@ -356,8 +261,6 @@ iptables_fw_destroy(void)
     int got_authdown_ruleset = NULL == get_ruleset(FWRULESET_AUTH_IS_DOWN) ? 0 : 1;
     fw_quiet = 1;
 
-    debug(LOG_DEBUG, "Destroying our iptables entries");
-
     /*
      *
      * Everything in the NAT table
@@ -453,7 +356,7 @@ iptables_fw_destroy_mention(const char *table, const char *chain, const char *me
 int
 iptables_fw_access(fw_access_t type, const char *ip, const char *mac, int tag)
 {
-    int rc;
+    int rc = -1;
 	int ret = -1;
 	char *script;
 
@@ -510,69 +413,41 @@ iptables_fw_access_host(fw_access_t type, const char *host)
 int
 iptables_fw_auth_unreachable(int tag)
 {
-    int got_authdown_ruleset = NULL == get_ruleset(FWRULESET_AUTH_IS_DOWN) ? 0 : 1;
-    if (got_authdown_ruleset)
-        return iptables_do_command("-t nat -I " CHAIN_OUTGOING " 1 -j ACCEPT");
-    else
-        return 1;
+	int ret = -1;
+	int rc = 1;
+	char *script;
+
+    /*check the iptables rules exist*/
+	safe_asprintf(&script, "iptables -t nat -C %s -j ACCEPT", CHAIN_OUTGOING);
+    iptables_insert_gateway_id(&script);
+    ret = system(script);
+    free(script);
+
+    if(ret != 0 ){
+	    rc = iptables_do_command("-t nat -I " CHAIN_OUTGOING " 1 -j ACCEPT");
+    }
+	
+	return rc;
 }
 
 /** Remove mark when auth server is reachable again */
 int
 iptables_fw_auth_reachable(void)
 {
-    int got_authdown_ruleset = NULL == get_ruleset(FWRULESET_AUTH_IS_DOWN) ? 0 : 1;
-    if (got_authdown_ruleset)
-        return iptables_do_command("-t nat -D " CHAIN_OUTGOING " -j ACCEPT");
-    else
-        return 1;
-}
+	int ret = -1;
+	int rc = 1;
+	char *script;
 
-/** Update the counters of all the clients in the client list */
-int
-iptables_fw_counters_update(void)
-{
-    FILE *output;
-    char *script, mac[18], rc;
-    unsigned long long int counter;
-    t_client *p1;
-
-    /* Look for outgoing traffic */
-    safe_asprintf(&script, "%s %s", "iptables", "-v -n -x -t nat -L " CHAIN_TO_INTERNET);
+    /*check the iptables rules exist*/
+	safe_asprintf(&script, "iptables -t nat -C %s -j ACCEPT", CHAIN_OUTGOING);
     iptables_insert_gateway_id(&script);
-    output = popen(script, "r");
+    ret = system(script);
     free(script);
-    if (!output) {
-        debug(LOG_ERR, "popen(): %s", strerror(errno));
-        return -1;
+
+    if(ret == 0 ){
+	    rc = iptables_do_command("-t nat -D " CHAIN_OUTGOING " -j ACCEPT");
     }
 
-    /* skip the first two lines */
-    while (('\n' != fgetc(output)) && !feof(output)) ;
-    while (('\n' != fgetc(output)) && !feof(output)) ;
-    while (output && !(feof(output))) {
-		rc = fscanf(output, "%*s %llu %*s %*s %*s %*s %*s %*s %*s %*s %s %*s %*s %*s", &counter, mac);	
-        if (2 == rc && EOF != rc) {
-            /* Sanity */
-            if(!is_mac(mac)){
-                debug(LOG_WARNING, "I was supposed to read an mac address but instead got [%s] - ignoring it", mac);
-                continue;
-            }
-            debug(LOG_DEBUG, "Read outgoing traffic for %s: Bytes=%llu", mac, counter);
-            LOCK_CLIENT_LIST();
-            if ((p1 = client_list_find_by_mac(mac))) {
-                if ((p1->counters.outgoing - p1->counters.outgoing_history) < counter) {
-                    p1->counters.outgoing_delta = p1->counters.outgoing_history + counter - p1->counters.outgoing;
-                    p1->counters.outgoing = p1->counters.outgoing_history + counter;
-                    p1->counters.last_updated = time(NULL);
-                    debug(LOG_DEBUG, "%s - Outgoing traffic %llu bytes, updated counter.outgoing to %llu bytes.  Updated last_updated to %d", mac,
-                          counter, p1->counters.outgoing, p1->counters.last_updated);
-                }
-            }
-            UNLOCK_CLIENT_LIST();
-        }
-    }
-    pclose(output);
-
-    return 1;
+	return rc;
 }
+

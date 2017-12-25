@@ -72,6 +72,11 @@ auth_server_request(t_authresponse * authresponse, const char *request_type, con
     char buf[MAX_BUF];
     char *tmp;
     char *safe_token;
+	char t[64] = {'\0'};
+	char k[64] = {'\0'};
+	int code = -1;
+	char is_auth = 0;
+	char *json_data = NULL;
     t_auth_serv *auth_server = NULL;
     auth_server = get_auth_server();
 
@@ -79,7 +84,8 @@ auth_server_request(t_authresponse * authresponse, const char *request_type, con
     authresponse->authcode = AUTH_ERROR;
 
     sockfd = connect_auth_server();
-
+	/*get the t and k value*/
+	build_t_key(t,k);
         /**
 	 * TODO: XXX change the PHP so we can harmonize stage as request_type
 	 * everywhere.
@@ -89,7 +95,9 @@ auth_server_request(t_authresponse * authresponse, const char *request_type, con
     if(config -> deltatraffic) {
            snprintf(buf, (sizeof(buf) - 1),
              "GET %s%sstage=%s&ip=%s&mac=%s&token=%s&incoming=%llu&outgoing=%llu&incomingdelta=%llu&outgoingdelta=%llu&gw_id=%s HTTP/1.0\r\n"
-             "User-Agent: WiFiDog %s\r\n"
+             "T: %s\r\n"
+			 "K: %s\r\n"
+			 "User-Agent: WiFiDog %s\r\n"
              "Host: %s\r\n"
              "\r\n",
              auth_server->authserv_path,
@@ -100,18 +108,20 @@ auth_server_request(t_authresponse * authresponse, const char *request_type, con
              outgoing, 
              incoming_delta, 
              outgoing_delta,
-             config->gw_id, VERSION, auth_server->authserv_hostname);
+             config->gw_id, t,k,VERSION, auth_server->authserv_hostname);
     } else {
             snprintf(buf, (sizeof(buf) - 1),
              "GET %s%sstage=%s&ip=%s&mac=%s&token=%s&incoming=%llu&outgoing=%llu&gw_id=%s HTTP/1.0\r\n"
-             "User-Agent: WiFiDog %s\r\n"
+             "T: %s\r\n"
+			 "K: %s\r\n"
+			 "User-Agent: WiFiDog %s\r\n"
              "Host: %s\r\n"
              "\r\n",
              auth_server->authserv_path,
              auth_server->authserv_auth_script_path_fragment,
              request_type,
              ip,
-             mac, safe_token, incoming, outgoing, config->gw_id, VERSION, auth_server->authserv_hostname);
+             mac, safe_token, incoming, outgoing, config->gw_id, t,k,VERSION, auth_server->authserv_hostname);
         }
     free(safe_token);
 
@@ -129,21 +139,21 @@ auth_server_request(t_authresponse * authresponse, const char *request_type, con
     if (NULL == res) {
         debug(LOG_ERR, "There was a problem talking to the auth server!");
         return (AUTH_ERROR);
-    }
+    }else{
+		json_data = http_get_json_data(res);
+		json_parse(json_data,"code",(char *)&code,NULL);
+		
+		if (code != 0){
+			free(res);
+			authresponse->authcode = 1;
+			return AUTH_ERROR ;
+		}
 
-    if ((tmp = strstr(res, "Auth: "))) {
-        if (sscanf(tmp, "Auth: %d", (int *)&authresponse->authcode) == 1) {
-            debug(LOG_INFO, "Auth server returned authentication code %d", authresponse->authcode);
-            free(res);
-            return (authresponse->authcode);
-        } else {
-            debug(LOG_WARNING, "Auth server did not return expected authentication code");
-            free(res);
-            return (AUTH_ERROR);
-        }
-    }
-    free(res);
-    return (AUTH_ERROR);
+		json_parse(json_data,"auth",&is_auth,NULL);
+		authresponse->authcode = is_auth;
+		free(res);
+		return authresponse->authcode ;
+	}
 }
 
 /* Tries really hard to connect to an auth server. Returns a file descriptor, -1 on error

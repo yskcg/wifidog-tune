@@ -74,7 +74,7 @@ thread_ping(void *arg)
     while (1) {
         /* Make sure we check the servers at the very begining */
         debug(LOG_DEBUG, "Running ping()");
-        ping();
+		ping();
 		sync_white_black_list();
 
         /* Sleep for config.checkinterval seconds... */
@@ -104,12 +104,21 @@ ping(void)
     unsigned long int sys_uptime = 0;
     unsigned int sys_memfree = 0;
     float sys_load = 0;
+	int  code = 0;
+	char t[64] = {'\0'};
+	char k[64] = {'\0'};
+	char ret = 0;
+	char is_auth = 0;
+	char *json_data = NULL;
     t_auth_serv *auth_server = NULL;
+	s_config *config = config_get_config();
     auth_server = get_auth_server();
     static int authdown = 0;
 
     debug(LOG_DEBUG, "Entering ping()");
     memset(request, 0, sizeof(request));
+	/*get the t and k value*/
+	build_t_key(t,k);
 
     /*
      * The ping thread does not really try to see if the auth server is actually
@@ -160,18 +169,16 @@ ping(void)
      * Prep & send request
      */
     snprintf(request, sizeof(request) - 1,
-             "GET %s%sgw_id=%s&sys_uptime=%lu&sys_memfree=%u&sys_load=%.2f&wifidog_uptime=%lu HTTP/1.0\r\n"
-             "User-Agent: WiFiDog %s\r\n"
+             "GET /auth/%sgw_id=%s&sys_uptime=%lu&sys_memfree=%u&sys_load=%.2f&wifidog_uptime=%lu HTTP/1.0\r\n"
+			 "T: %s\r\n"
+			 "K: %s\r\n"
+			 "User-Agent: WiFiDog %s\r\n"
              "Host: %s\r\n"
              "\r\n",
-             auth_server->authserv_path,
-             auth_server->authserv_ping_script_path_fragment,
-             config_get_config()->gw_id,
-             sys_uptime,
-             sys_memfree,
-             sys_load,
-             (long unsigned int)((long unsigned int)time(NULL) - (long unsigned int)started_time),
+             auth_server->authserv_ping_script_path_fragment,config->gw_id,sys_uptime,sys_memfree,sys_load,(long unsigned int)((long unsigned int)time(NULL) - (long unsigned int)started_time),\
+			 t,k,
              VERSION, auth_server->authserv_hostname);
+
 
     char *res;
 #ifdef USE_CYASSL
@@ -190,21 +197,41 @@ ping(void)
             fw_set_authdown();
             authdown = 1;
         }
-    } else if (strstr(res, "Pong") == 0) {
-        debug(LOG_WARNING, "Auth server did NOT say Pong!");
-        if (!authdown) {
-            fw_set_authdown();
-            authdown = 1;
-        }
-        free(res);
     } else {
-        debug(LOG_DEBUG, "Auth Server Says: Pong");
-        if (authdown) {
-            fw_set_authup();
-            authdown = 0;
-        }
-        free(res);
-    }
+		json_data = http_get_json_data(res);
+		json_parse(json_data,"code",(char *)&code,NULL);
+		
+		if (code != 0){
+			free(res);
+			if (!authdown) {
+				fw_set_authdown();
+				authdown = 1;
+			}
+			return ;
+		}
+
+		json_parse(json_data,"result",&ret,NULL);
+
+		if (ret){
+			json_parse(json_data,"is_auth",&is_auth,NULL);
+			
+			if(is_auth){
+				if (authdown) {
+					fw_set_authup();
+					authdown = 0;
+				}
+			}else{
+				if (!authdown) {
+					fw_set_authdown();
+					authdown = 1;
+				}
+			}
+
+			config->auth_status = is_auth ;
+			free(res);
+		}
+	}
+
     return;
 }
 
@@ -223,101 +250,22 @@ int is_mac(char *mac_addr)
 
 }
 
-static void apply_white_black_list(char *buf,char* version)
+static void apply_white_black_list(char * mac,char * key)
 {
-	char *p_key_value = NULL;
-	char *p_key_value_end = NULL;
-	char *p_mac = NULL;
-	char *p_mac_end = NULL;
-	char *p_value = NULL;
-
-	char string_version[64] = {'\0'};
-	char key[32] = {'\0'};
-	char value[640] = {'\0'};
-	char mac[20] = {'\0'};
-	int server_version;
+	/*Flash the iptables white black list*/
 	char white_black_flag = -1; //0:white;1:black;
 
+	if(is_mac(mac)){
+		if(strcmp(key,"blacklist") ==0){
+			white_black_flag = 1;
+		}else if(strcmp(key,"whitelist") ==0 ){
+			white_black_flag = 0;
+		}
 
-	if (strlen(buf) <=1 || buf[0] ==10){ //排除文件换行无内容情况
-		return;
-	}else{
-		p_key_value = strstr(buf,"=");
-		p_key_value_end = strstr(buf,"\n");
-		//printf("%s--%d\n",p_key_value+1,p_key_value_end-p_key_value);
-		strncpy(string_version,p_key_value+1,p_key_value_end-p_key_value -1);
-		server_version = atoi(string_version);
-		debug(LOG_DEBUG,"serversion=%d,localversion=%d\n",server_version,*version);
-
-		if(*version == server_version || server_version == 0 ){
-			return;
-		}else{
-			*version = server_version;
-			while(strlen(p_key_value_end) > 0){
-				memset(key,'\0',sizeof(key));
-				memset(value ,'\0',sizeof(value));
-				white_black_flag = -1;
-				p_key_value_end = p_key_value_end +1;
-				p_key_value = strstr(p_key_value_end,"=");
-
-				if(p_key_value == NULL){
-					break;
-				}
-
-				p_key_value = p_key_value +1;
-				strncpy (key, p_key_value_end, p_key_value - p_key_value_end -1);
-				p_key_value_end = strstr(p_key_value,"\n");
-
-				if(p_key_value_end == NULL){
-					break;
-				}
-				strncpy(value,p_key_value,p_key_value_end-p_key_value);
-				debug(LOG_DEBUG, "%s=%s value_len=%d\n",key,value,strlen(value));
-
-				/*Flash the iptables white black list*/
-				if(strcmp(key,"blacklist") ==0){
-					iptables_fw_clear_black_list();
-					debug(LOG_DEBUG, "iptables -t nat -F blacklist\n");
-					white_black_flag = 1;
-				}else if(strcmp(key,"whitelist") ==0 ){
-					iptables_fw_clear_white_list();
-					debug(LOG_DEBUG, "iptables -t nat -F whitelist\n");
-					white_black_flag = 0;
-				}
-				/*parse the value*/
-				p_value = value;
-				while(strlen(p_value) >0){
-					p_mac = strstr(p_value,",");
-
-					if(p_mac == NULL){
-						if(is_mac(p_value)){
-							debug(LOG_DEBUG, "Add %s to %s\n",p_value,key);
-							if(white_black_flag == 0){
-								iptables_fw_set_white_list((const char *) p_value);
-							}else if(white_black_flag == 1){
-								iptables_fw_set_black_list((const char *) p_value);
-							}
-						}
-						break;
-					}else{
-						memset(mac,'\0',sizeof(mac));
-						p_mac = p_mac +1;
-						//printf("p_mac:%s\n",p_mac);
-						strncpy(mac,p_value,p_mac-p_value-1);
-						p_value = p_mac;
-						//printf("p_value:%s\n",p_value);
-						if(is_mac(p_value)){
-							debug(LOG_DEBUG, "Add %s to %s\n",mac,key);
-							if(white_black_flag == 0){
-								iptables_fw_set_white_list((const char *) mac);
-							}else if(white_black_flag == 1){
-								iptables_fw_set_black_list((const char *) mac);
-							}
-						}
-					}
-
-				}
-			}
+		if(white_black_flag == 0){
+			iptables_fw_set_white_list((const char *) mac);
+		}else if(white_black_flag == 1){
+			iptables_fw_set_black_list((const char *) mac);
 		}
 	}
 }
@@ -325,12 +273,13 @@ static void apply_white_black_list(char *buf,char* version)
 static void sync_white_black_list(void)
 {
 	char request[MAX_BUF];
-    FILE *fh;
     int sockfd;
 	int len = 0;
-    unsigned long int sys_uptime = 0;
-    unsigned int sys_memfree = 0;
-    float sys_load = 0;
+	int  code = 0;
+	int server_version;
+	char t[64] = {'\0'};
+	char k[64] = {'\0'};
+	char *json_data = NULL;
     t_auth_serv *auth_server = NULL;
     auth_server = get_auth_server();
 	char *p_value = NULL;
@@ -351,14 +300,16 @@ static void sync_white_black_list(void)
 	/*
      * Prep & send request
      */
+	build_t_key(t,k);
     snprintf(request, sizeof(request) - 1,
-             "GET %sbaw?gw_id=%s&v=%u HTTP/1.0\r\n"
+             "GET /auth/baw?gw_id=%s&v=%u HTTP/1.0\r\n"
+			 "T: %s\r\n"
+			 "K: %s\r\n"
              "User-Agent: WiFiDog %s\r\n"
              "Host: %s\r\n"
              "\r\n",
-             auth_server->authserv_path,
              config_get_config()->gw_id,
-			 version,
+			 version,t,k,
              VERSION, auth_server->authserv_hostname);
 
     char *res;
@@ -375,21 +326,62 @@ static void sync_white_black_list(void)
     if (NULL == res) {
 		return ;
     }else{
-		p_value = strstr(res,"version=");
+		json_data = http_get_json_data(res);
+		json_parse(json_data,"code",(char *)&code,NULL);
 		
-		if(p_value == NULL){
+		if (code != 0){
 			free(res);
 			return ;
 		}
 
-		debug(LOG_DEBUG, "before len:%d\nvalue:%s---",len,p_value);
-		//len = p_value_end - p_value;
-		//memcpy(&p_value_end[len],"\n",1);
-		strcat(p_value,"\n");
-		apply_white_black_list(p_value,&version);
+		json_parse(json_data,"version",(int *)&server_version,NULL);
+		
+		if( (server_version != version) && server_version != 0 ){
+			int len = 0;
+			char type = 0;
+			int i = 0;
+			
+			version = server_version;
+			json_parse_get_type_len(json_data,"blacklist",&type,&len);
+
+			if(type == json_type_array && len >=0){
+				iptables_fw_clear_black_list();
+				
+				if(len >0){
+					char mac_list[len][32];
+
+					memset(mac_list,0,sizeof(mac_list));
+					json_parse(json_data,"blacklist",mac_list,&len);
+					
+					for(i=0;i<len;i++){
+						apply_white_black_list(mac_list[i],"blacklist");
+					}
+				}
+			}
+			
+			len = 0;
+			type =0;
+			i = 0;
+
+			json_parse_get_type_len(json_data,"whitelist",&type,&len);
+
+			if(type == json_type_array && len >=0){
+				iptables_fw_clear_white_list();
+				
+				if(len >0){
+					char mac_list[len][32];
+
+					memset(mac_list,0,sizeof(mac_list));
+					json_parse(json_data,"whitelist",mac_list,&len);
+					
+					for(i=0;i<len;i++){
+						apply_white_black_list(mac_list[i],"whitelist");
+					}
+				}
+			}
+		}
+
 		free(res);
 	}
     return;
-
-
 }

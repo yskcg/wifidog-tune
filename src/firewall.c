@@ -113,16 +113,11 @@ fw_allow_host(const char *host)
 int
 fw_deny(t_client * client)
 {
-    int i;
-	int mac_len;
 	struct in_addr addr;
-	char mac_temp[32] = {'\0'};
-	char file_path[128] = {'\0'};
 	char logoff_file[512] = {'\0'};
-	char shell_cmd[128] = {'\0'};
+	char shell_cmd[1024] = {'\0'};
 	int fw_connection_state = client->fw_connection_state;
-	
-	s_config *config = config_get_config();
+
     debug(LOG_DEBUG, "Denying %s %s with fw_connection_state %d", client->ip, client->mac, client->fw_connection_state);
 
 	/*generate the logoff file*/
@@ -132,16 +127,19 @@ fw_deny(t_client * client)
 	/*generate the logon file*/
 
 	inet_pton(AF_INET, client->ip, (void *)&addr);
-	system("mkdir -p /tmp/gram/apstatus/on_off_line/");
+	//system("mkdir -p /tmp/gram/apstatus/on_off_line/");
+	execute("mkdir -p /tmp/gram/apstatus/on_off_line/",0);
 	sprintf(shell_cmd,"echo >/tmp/gram/apstatus/on_off_line/%u_0.log",htonl(addr.s_addr));
-	system(shell_cmd);
-	sprintf(logoff_file,"auth_mode=4\r\naccount=%s\r\nip_type=4\r\nip=%s\r\nusr_mac=%s\r\nonoff_flag=0\r\nonoff_time=%d\r\nonline_time=%d\r\nupload=0\r\ndownload=0\r\n",\
+	//system(shell_cmd);
+	execute(shell_cmd,0);
+	sprintf(logoff_file,"auth_mode=4\r\naccount=%s\r\nip_type=4\r\nip=%s\r\nusr_mac=%s\r\nonoff_flag=0\r\nonoff_time=%ld\r\nonline_time=%ld\r\nupload=0\r\ndownload=0\r\n",\
 			client->uid,client->ip,client->mac,client->logoff_time,client->logoff_time - client->logon_time);
 
 	memset(shell_cmd,0,sizeof(shell_cmd));
 	sprintf(shell_cmd,"echo \"%s\" >/tmp/gram/apstatus/on_off_line/%u_0.log",logoff_file,htonl(addr.s_addr));
 
-	system(shell_cmd);
+	//system(shell_cmd);
+	execute(shell_cmd,0);
 	
     client->fw_connection_state = FW_MARK_NONE; /* Clear */
     return _fw_deny_raw(client->ip, client->mac, fw_connection_state);
@@ -273,7 +271,6 @@ int
 fw_destroy(void)
 {
     close_icmp_socket();
-    debug(LOG_INFO, "Removing Firewall rules");
     return iptables_fw_destroy();
 }
 

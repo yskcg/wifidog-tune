@@ -93,7 +93,4 @@ int iptables_fw_auth_unreachable(int tag);
 /** @brief Remove mark when auth server is reachable again */
 int iptables_fw_auth_reachable(void);
 
-/** @brief All counters in the client list */
-int iptables_fw_counters_update(void);
-
 #endif                          /* _IPTABLES_H_ */

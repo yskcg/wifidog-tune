@@ -187,6 +187,7 @@ config_init(void)
 	memset(config.device_sn,0,sizeof(config.device_sn));
 	memset(config.device_base_mac,0,sizeof(config.device_base_mac));
 
+	config.auth_status = 0; /*default turn on the auth */
     config.gw_interface = NULL;
     config.gw_address = NULL;
     config.gw_port = DEFAULT_GATEWAYPORT;

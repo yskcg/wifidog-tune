@@ -1,7 +1,11 @@
+#for hw hs8546
+MY_TARGET=arm-linux
 #For zte F663N
 #MY_TARGET=mips-unknown-linux-uclibc
 #For zte F631
-MY_TARGET=arm-linux-uclibc
+#MY_TARGET=arm-linux-uclibc
+#MY_TARGET=i486-openwrt-linux
+#MY_TARGET=mipsel-openwrt-linux
 export CC=$(MY_TARGET)-gcc
 export AR=$(MY_TARGET)-ar
 export CPP=$(MY_TARGET) -E
@@ -15,7 +19,7 @@ export AR = $(MY_TARGET)-ar
 top_dir = $(PWD)
 export top_dir
 
-exclude_dirs := include bin doc jsonC libpcap-1.5 scripts tcpdump-4.5
+exclude_dirs := include bin doc  libpcap-1.5 scripts tcpdump-4.5
 dirs := $(shell find . -maxdepth 1 -type d)
 
 dirs := $(basename $(patsubst ./%,%,$(dirs)))
@@ -52,4 +56,5 @@ $(clean_dirs):
 	$(MAKE) -C $(patsubst _clean_%,%,$@) clean
 
 clean: $(clean_dirs)    
-	
+	rm -rf bin
+	rm -rf include	

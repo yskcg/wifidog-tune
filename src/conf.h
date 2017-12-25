@@ -174,6 +174,7 @@ typedef struct {
 	char device_base_mac[32];
 	char gw_id[128];                /**< @brief ID of the Gateway, sent to central
 				     server */
+	char auth_status;
     t_auth_serv *auth_servers;  /**< @brief Auth servers list */
     char *httpdname;            /**< @brief Name the web server will return when
 				     replying to a request */
