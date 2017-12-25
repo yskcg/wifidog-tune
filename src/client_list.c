@@ -136,13 +136,11 @@ static void generate_ip_nat_port_range(const char *ip,char *nat_port_range)
 t_client *
 client_list_add(const char *ip, const char *mac, const char *token, const char *uid)
 {
-    int i;
-
 	t_client *curclient;
 	struct in_addr addr;
 	
 	char logon_file[512] = {'\0'};
-	char shell_cmd[128] = {'\0'};
+	char shell_cmd[1024] = {'\0'};
 	char nat_port_range[32] = {'\0'};
 	
     curclient = client_get_new();
@@ -167,20 +165,21 @@ client_list_add(const char *ip, const char *mac, const char *token, const char *
 	/*generate the logon file*/
 	if(uid){
 		inet_pton(AF_INET, ip, (void *)&addr);
-		system("mkdir -p /tmp/gram/apstatus/on_off_line/");
+		//system("mkdir -p /tmp/gram/apstatus/on_off_line/");
+		execute("mkdir -p /tmp/gram/apstatus/on_off_line/", 0);
 		sprintf(shell_cmd,"echo >/tmp/gram/apstatus/on_off_line/%u_1.log",htonl(addr.s_addr));
 		debug(LOG_INFO,"IP ADDRESS IS :0x%x 0x%x %s\n",addr.s_addr,htonl(addr.s_addr),shell_cmd);
-		system(shell_cmd);
-		sprintf(logon_file,"auth_mode=4\r\naccount=%s\r\nip_type=4\r\nip=%s\r\nusr_mac=%s\r\nonoff_flag=1\r\nonoff_time=%u\r\nnat_port=%s\r\nfield_strength=\r\n",\
+		//system(shell_cmd);
+		execute(shell_cmd,0);
+		sprintf(logon_file,"auth_mode=4\r\naccount=%s\r\nip_type=4\r\nip=%s\r\nusr_mac=%s\r\nonoff_flag=1\r\nonoff_time=%ld\r\nnat_port=%s\r\nfield_strength=\r\n",\
 				curclient->uid,curclient->ip,curclient->mac,curclient->logon_time,nat_port_range);
 
-		debug(LOG_INFO,"account:%s ip:%s usr_mac:%s logon_time:%u nat_port:%s\n",curclient->uid,curclient->ip,curclient->mac,curclient->logon_time,nat_port_range);
+		debug(LOG_INFO,"account:%s ip:%s usr_mac:%s logon_time:%lu nat_port:%s\n",curclient->uid,curclient->ip,curclient->mac,curclient->logon_time,nat_port_range);
 		memset(shell_cmd,0,sizeof(shell_cmd));
 		sprintf(shell_cmd,"echo \"%s\" >/tmp/gram/apstatus/on_off_line/%u_1.log",logon_file,htonl(addr.s_addr));
-		system(shell_cmd);	
+		//system(shell_cmd);
+		execute(shell_cmd,0);
 
-		debug(LOG_INFO,"%s---\n",shell_cmd);	
-		
 		debug(LOG_INFO, "Added a new client to linked list: IP: %s Token: %s file content:%s", ip, token,logon_file);
 	}
 

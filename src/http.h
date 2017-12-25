@@ -28,6 +28,7 @@
 #define _HTTP_H_
 
 #include "httpd.h"
+#include "json_parse.h"
 
 /**@brief Callback for libhttpd, main entry point for captive portal */
 void http_callback_404(httpd *, request *, int);

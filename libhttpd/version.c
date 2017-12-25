@@ -19,5 +19,5 @@
 */
 
 char    LIBHTTPD_VERSION[] =  "1.4-wifidog",
-        LIBHTTPD_VENDOR[] =   "Hughes Technologies Pty Ltd";
+        LIBHTTPD_VENDOR[] =   "shaokunyang@163.com";
 

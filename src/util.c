@@ -60,6 +60,12 @@
 
 #include "../config.h"
 
+#include "simple_http.h"
+#include "conf.h"
+#include "centralserver.h"
+#include "http_json.h"
+#include "json_parse.h"
+
 #define LOCK_GHBN() do { \
 	debug(LOG_DEBUG, "Locking wd_gethostbyname()"); \
 	pthread_mutex_lock(&ghbn_mutex); \
@@ -117,9 +123,9 @@ execute(const char *cmd_line, int quiet)
     }
 
     /* for the parent:      */
-    debug(LOG_DEBUG, "Waiting for PID %d to exit", pid);
+    //debug(LOG_DEBUG, "Waiting for PID %d to exit", pid);
     rc = waitpid(pid, &status, 0);
-    debug(LOG_DEBUG, "Process PID %d exited", rc);
+    //debug(LOG_DEBUG, "Process PID %d exited", rc);
     
     if (-1 == rc) {
         debug(LOG_ERR, "waitpid() failed (%s)", strerror(errno));
@@ -413,3 +419,251 @@ save_pid_file(const char *pf)
 
     return;
 }
+
+/*
+ * When the device power on,get the gw_id from the server
+ * API:/register
+ *
+*/
+
+static unsigned char get_device_gw_id_request()
+{
+    char request[MAX_BUF];
+    int sockfd;
+	char *json_data = NULL;
+    char t[64] = {'\0'};
+	char k[64] = {'\0'};
+	int  code = 0; 
+
+	t_auth_serv *auth_server = NULL;
+
+	/*get the t and k value*/
+	build_t_key(t,k);
+	s_config *config = config_get_config();
+    auth_server = get_auth_server();
+	
+    debug(LOG_DEBUG, "Entering get get_device_gw_id()");
+    memset(request, 0, sizeof(request));
+
+    sockfd = connect_auth_server();
+    if (sockfd == -1) {
+        return 1;
+    }
+
+    /*
+     * Prep & send request
+     */
+    snprintf(request, sizeof(request) - 1,
+             "GET /auth/register?mac=%s HTTP/1.0\r\n"
+			 "T: %s\r\n"
+			 "K: %s\r\n"
+             "User-Agent: WiFiDog %s\r\n"
+             "Host: %s\r\n"
+             "\r\n",
+			 config->device_base_mac,t,k,
+             VERSION, 
+			 auth_server->authserv_hostname
+			);
+    char *res;
+#ifdef USE_CYASSL
+    if (auth_server->authserv_use_ssl) {
+        res = https_get(sockfd, request, auth_server->authserv_hostname);
+    } else {
+        res = http_get(sockfd, request);
+    }
+#endif
+#ifndef USE_CYASSL
+    res = http_get(sockfd, request);
+#endif
+    if (NULL == res) {
+       return 1;
+    } else {
+		json_data = http_get_json_data(res);
+		json_parse(json_data,"code",(char*)&code,NULL);
+		
+		if (code != 0){
+			free(res);
+			return 1 ;
+		}else{
+			/*generate the gw_id*/
+			json_parse(json_data,"gw_id",config->gw_id,NULL);
+			json_parse(json_data,"is_auth",&config->auth_status,NULL);
+
+			if(config->gw_id && strlen(config->gw_id) >0 ){
+				free(res);
+				return 0;
+			}
+		}
+
+		free(res);
+		return 1;
+    }
+
+}
+
+unsigned char get_device_gw_id(void)
+{
+	while(get_device_gw_id_request()){
+		debug(LOG_DEBUG, "%s %d get the gw_id error wait for five seconds and try again!!!\n",__FUNCTION__,__LINE__);
+		sleep(5);
+	}
+	
+	return 0;
+}
+
+/**
+ * compute the value of a file
+ * @param  file_path
+ * @param  md5_str
+ * @return 0: ok, -1: fail
+ */
+int Compute_file_md5(const char *file_path, char *md5_str)
+{
+	int i;
+	int fd;
+	int ret;
+	unsigned char data[READ_DATA_SIZE];
+	unsigned char md5_value[MD5_SIZE];
+	MD5_CTX md5;
+
+	fd = open(file_path, O_RDONLY);
+	if (-1 == fd)
+	{
+		perror("open");
+		return -1;
+	}
+
+	// init md5
+	MD5Init(&md5);
+
+	while (1)
+	{
+		ret = read(fd, data, READ_DATA_SIZE);
+		if (-1 == ret)
+		{
+			perror("read");
+			return -1;
+		}
+
+		MD5Update(&md5, data, ret);
+
+		if (0 == ret || ret < READ_DATA_SIZE)
+		{
+			break;
+		}
+	}
+
+	close(fd);
+
+	MD5Final(&md5, md5_value);
+
+	// convert md5 value to md5 string
+	for(i = 0; i < MD5_SIZE; i++)
+	{
+		snprintf(md5_str + i*2, 2+1, "%02x", md5_value[i]);
+	}
+
+	return 0;
+}
+
+/**
+ * compute the value of a string
+ * @param  dest_str
+ * @param  dest_len
+ * @param  md5_str
+ */
+int Compute_string_md5(unsigned char *dest_str, unsigned int dest_len, char *md5_str)
+{
+	int i;
+	unsigned char md5_value[MD5_SIZE];
+	MD5_CTX md5;
+
+	// init md5
+	MD5Init(&md5);
+
+	MD5Update(&md5, dest_str, dest_len);
+
+	MD5Final(&md5, md5_value);
+
+	// convert md5 value to md5 string
+	for(i = 0; i < MD5_SIZE; i++)
+	{
+		snprintf(md5_str + i*2, 2+1, "%02x", md5_value[i]);
+	}
+
+	return 0;
+}
+
+
+static void wifidog_itoa(unsigned int n,unsigned char *string)
+{
+	int i,j,sign;
+	int k = 0;
+	char temp[128] = {'\0'};
+	
+    if((sign=n)<0)    //记录符号  
+        n=-n;         //使n成为正数  
+    i=0;
+
+    do{  
+        temp[i++]=n%10+'0';    //取下一个数字  
+    }while((n/=10)>0);      //循环相除  
+  
+    if(sign<0)  
+        temp[i++]='-';  
+    temp[i]='\0';  
+    for(j=i-1,k = 0;j>=0;j--,k++){        //生成的数字是逆序的，所以要逆序输出  
+		string[k] = temp[j];
+	}
+}
+
+/*
+	*  t = TIMESTAMP
+	*  end = t[9:]
+	*  s = md5(md5(t[end:]) + t[0:end])
+	*  k = s[end:]
+* */
+unsigned long int build_t_key(char *t,char *k)
+{
+	time_t time_stamp = 0;	
+	time_t end = 0;
+	unsigned char time_string[64] = {'\n'};
+	char md5_str[MD5_STR_LEN + 1];
+	unsigned char string_time[64] = {'\0'};
+
+	time_stamp = time(NULL);
+	
+	/*All is string,make the time stamp conver to string*/
+	wifidog_itoa(time_stamp,time_string);
+	/*end = time[9:]*/
+	end  = atoi((const char *)(time_string+9));
+	//md5 (const char *message, long len, char *output);
+	if ( end != 0 ){
+		Compute_string_md5(time_string + end, strlen((const char *)(time_string+end)), md5_str);
+	}else{
+		Compute_string_md5(time_string , strlen((const char *)(time_string)), md5_str);
+	}
+
+	memcpy(string_time,md5_str,strlen(md5_str));
+	
+	if ( end != 0 ){
+		memcpy(string_time+strlen(md5_str),time_string,end);
+	}
+	
+	Compute_string_md5(string_time, strlen((const char *)string_time), md5_str);
+
+	if ( end != 0 ){
+		memcpy(k,md5_str+end,strlen((const char *)(md5_str+end)));
+	}else{
+		memcpy(k,md5_str,strlen((const char *)(md5_str)));
+	}
+
+	memcpy(t,time_string,strlen((const char *)(time_string)));
+
+	return 0;
+}
+
+
+
+
+

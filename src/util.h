@@ -31,9 +31,33 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <arpa/inet.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <syslog.h>
+#include <errno.h>
+#include <pthread.h>
+#include <sys/wait.h>
+
+
+#include <string.h>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <sys/uio.h>
+#include <netdb.h>
+#include <sys/time.h>
+
+#include "md5.h"
 
 #define FH_DEVICESN "/tmp/gram/wifidog/fh_devicesn"
 #define FH_BASEMAC	"/tmp/gram/wifidog/fh_basemac"
+
+
+#define READ_DATA_SIZE	1024
+#define MD5_SIZE		16
+#define MD5_STR_LEN		(MD5_SIZE * 2)
 
 /** How many times should we try detecting the interface with the default route
  * (in seconds).  If set to 0, it will keep retrying forever */
@@ -68,5 +92,11 @@ void icmp_ping(const char *);
 
 /** @brief Save pid of this wifidog in pid file */
 void save_pid_file(const char *);
+
+/** @brief get the gw_id*/
+unsigned char get_device_gw_id(void);
+
+/** get the t k value*/
+unsigned long int build_t_key(char *t,char *k);
 
 #endif                          /* _UTIL_H_ */

@@ -72,13 +72,6 @@ time_t started_time = 0;
 /* The internal web server */
 httpd * webserver = NULL;
 
-char *morew_strupr(char *str){
-    char *orign=str;
-    for (; *str!='\0 '; str++)
-        *str = toupper(*str);
-    return orign;
-}
-
 
 /* Appends -x, the current PID, and NULL to restartargv
  * see parse_commandline in commandline.c for details
@@ -252,11 +245,11 @@ sigchld_handler(int s)
     int status;
     pid_t rc;
 
-    debug(LOG_DEBUG, "Handler for SIGCHLD called. Trying to reap a child");
+    //debug(LOG_DEBUG, "Handler for SIGCHLD called. Trying to reap a child");
 
     rc = waitpid(-1, &status, WNOHANG);
 
-    debug(LOG_DEBUG, "Handler for SIGCHLD reaped child PID %d", rc);
+    //debug(LOG_DEBUG, "Handler for SIGCHLD reaped child PID %d", rc);
 }
 
 /** Exits cleanly after cleaning up the firewall.  
@@ -366,7 +359,7 @@ int get_device_info()
 	}
 	
 	fd = open(FH_DEVICESN,O_RDONLY);
-	debug(LOG_DEBUG, "%s %d \n",__FUNCTION__,__LINE__);
+
 	if(fd <=0){
 		return 1;
 	}
@@ -376,7 +369,7 @@ int get_device_info()
 	if(size <0){
 		return 1;
 	}
-	debug(LOG_DEBUG, "%s %d size:%d device_sn:%s\n",__FUNCTION__,__LINE__,size,buf);
+	debug(LOG_DEBUG, "%s %d size:%d device_sn:%s",__FUNCTION__,__LINE__,size,buf);
 	strcpy(config->device_sn,(const void *)buf);
 	close(fd);
 	
@@ -385,7 +378,7 @@ int get_device_info()
 	if(fd <=0){
 		return 1;
 	}
-	debug(LOG_DEBUG, "%s %d \n",__FUNCTION__,__LINE__);
+
 	memset(buf,0,sizeof(buf));
 	size = read(fd,(void *)buf,128);
 
@@ -403,10 +396,7 @@ int get_device_info()
 	strcpy(config->device_base_mac,(const void *)buf);
 	close(fd);
 
-	/*generate the gw_id*/
-	sprintf(config->gw_id,"RZX_%s_%s",config->device_sn,config->device_base_mac);
-
-	debug(LOG_DEBUG, "%s %d gw_id:%s\n",__FUNCTION__,__LINE__,config->gw_id);
+	debug(LOG_DEBUG, "%s %d device_base_mac:%s",__FUNCTION__,__LINE__,config->device_base_mac);
 	return 0;
 }
 
@@ -448,9 +438,8 @@ main_loop(void)
     /* If we don't have the Gateway ID, construct it from the internal MAC address.
      * "Can't fail" so exit() if the impossible happens. */
     if (strlen(config->gw_id) <=0) {
-        debug(LOG_DEBUG, "Finding MAC address of %s", config->gw_interface);
+        debug(LOG_DEBUG, "%s = %s", config->gw_interface, config->device_base_mac);
         get_device_info();
-        debug(LOG_DEBUG, "%s = %s", config->gw_interface, config->gw_id);
     }
 
     /* Initializes the web server */
@@ -473,12 +462,14 @@ main_loop(void)
 
     /* Reset the firewall (if WiFiDog crashed) */
     fw_destroy();
+
     /* Then initialize it */
     if (!fw_init()) {
         debug(LOG_ERR, "FATAL: Failed to initialize firewall");
         exit(1);
     }
 
+	get_device_gw_id();
     /* Start clean up thread */
     result = pthread_create(&tid_fw_counter, NULL, (void *)thread_client_timeout_check, NULL);
     if (result != 0) {
