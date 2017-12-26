@@ -39,7 +39,7 @@ build_dir:
 	[ -d bin ] || mkdir bin
 	[ -d include ] || mkdir include
 
-$(SUBDIRS):ECHO
+$(SUBDIRS): $(ECHO)
 	$(MAKE) -C $@ linux
 
 ECHO:
