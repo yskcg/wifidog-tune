@@ -49,7 +49,7 @@ o:	$(ALL_O)
 
 
 $(WIFIDOG): $(WIFIDOG_O)  $(WIFIDOG_HEADERS)
-	@$(CC) -g -o $@ -L . $(MYLDFLAGS) $(WIFIDOG_O) $(LIBS)
+	@$(CC) -g -o $@  $(MYLDFLAGS) $(WIFIDOG_O) $(LIBS)
 
 $(WDCTL): $(WDCTL_O) $(WDCTL_HEADERS)
 	@$(CC) -g -o $@  $(MYLDFLAGS) $(WDCTL_O) $(LIBS)
