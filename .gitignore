@@ -26,9 +26,7 @@ COPYING
 FAQ
 NEWS
 autogen.sh
-src/Makefile.*
 Makefile.orig
-Makefile
 aclocal.m4
 autom4te.cache/
 config.h
@@ -39,8 +37,6 @@ config.status
 config/
 configure
 doc/Makefile
-libhttpd/Makefile
 libtool
-src/Makefile
 stamp-h1
 wifidog.spec
