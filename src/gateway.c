@@ -346,7 +346,7 @@ init_signals(void)
     }
 }
 
-int get_device_info()
+static void get_device_basemac()
 {
 	int fd;
 	int i;
@@ -354,36 +354,17 @@ int get_device_info()
 	int size;
 	s_config *config = config_get_config();
 
-	if(access(FH_DEVICESN,F_OK)!=0 || access(FH_BASEMAC,F_OK)!=0 ){
-		return 1;
-	}
-	
-	fd = open(FH_DEVICESN,O_RDONLY);
-
-	if(fd <=0){
-		return 1;
-	}
-	
-	size = read(fd,(void *)buf,128);
-
-	if(size <0){
-		return 1;
-	}
-	debug(LOG_DEBUG, "%s %d size:%d device_sn:%s",__FUNCTION__,__LINE__,size,buf);
-	strcpy(config->device_sn,(const void *)buf);
-	close(fd);
-	
 	fd = open(FH_BASEMAC,O_RDONLY);
 
 	if(fd <=0){
-		return 1;
+		return ;
 	}
 
 	memset(buf,0,sizeof(buf));
 	size = read(fd,(void *)buf,128);
 
 	if(size <0){
-		return 1;
+		return ;
 	}
 	/*conver the mac address*/
 	for(i=0;i<size;i++){
@@ -397,7 +378,43 @@ int get_device_info()
 	close(fd);
 
 	debug(LOG_DEBUG, "%s %d device_base_mac:%s",__FUNCTION__,__LINE__,config->device_base_mac);
-	return 0;
+}
+
+
+static void get_device_sn()
+{
+	int fd;
+	int i;
+	char buf[128] = {'\0'};
+	int size;
+	s_config *config = config_get_config();
+
+	if(access(FH_DEVICESN,F_OK)!=0 || access(FH_BASEMAC,F_OK)!=0 ){
+		return ;
+	}
+	
+	fd = open(FH_DEVICESN,O_RDONLY);
+
+	if(fd <=0){
+		return ;
+	}
+	
+	size = read(fd,(void *)buf,128);
+
+	if(size <0){
+		return ;
+	}
+	debug(LOG_DEBUG, "%s %d size:%d device_sn:%s",__FUNCTION__,__LINE__,size,buf);
+	strcpy(config->device_sn,(const void *)buf);
+	close(fd);
+	
+}
+
+
+int get_device_info()
+{
+	get_device_basemac();
+	get_device_sn();
 }
 
 /**@internal
