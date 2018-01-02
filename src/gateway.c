@@ -243,11 +243,10 @@ void
 sigchld_handler(int s)
 {
     int status;
-    pid_t rc;
 
     //debug(LOG_DEBUG, "Handler for SIGCHLD called. Trying to reap a child");
 
-    rc = waitpid(-1, &status, WNOHANG);
+    waitpid(-1, &status, WNOHANG);
 
     //debug(LOG_DEBUG, "Handler for SIGCHLD reaped child PID %d", rc);
 }
@@ -346,7 +345,7 @@ init_signals(void)
     }
 }
 
-static void get_device_basemac()
+static int get_device_basemac()
 {
 	int fd;
 	int i;
@@ -357,14 +356,14 @@ static void get_device_basemac()
 	fd = open(FH_BASEMAC,O_RDONLY);
 
 	if(fd <=0){
-		return ;
+		return 0;
 	}
 
 	memset(buf,0,sizeof(buf));
 	size = read(fd,(void *)buf,128);
 
 	if(size <0){
-		return ;
+		return 0;
 	}
 	/*conver the mac address*/
 	for(i=0;i<size;i++){
@@ -378,13 +377,14 @@ static void get_device_basemac()
 	close(fd);
 
 	debug(LOG_DEBUG, "%s %d device_base_mac:%s",__FUNCTION__,__LINE__,config->device_base_mac);
+
+	return 1;
 }
 
 
 static void get_device_sn()
 {
 	int fd;
-	int i;
 	char buf[128] = {'\0'};
 	int size;
 	s_config *config = config_get_config();
@@ -413,8 +413,15 @@ static void get_device_sn()
 
 int get_device_info()
 {
-	get_device_basemac();
+	const s_config *config;
+	config = config_get_config();
+
+	if(get_device_basemac() ==0){
+		get_iface_mac(config->gw_interface);
+	}
 	get_device_sn();
+
+	return 0;
 }
 
 /**@internal

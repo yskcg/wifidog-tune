@@ -70,7 +70,6 @@ auth_server_request(t_authresponse * authresponse, const char *request_type, con
     s_config *config = config_get_config();
     int sockfd;
     char buf[MAX_BUF];
-    char *tmp;
     char *safe_token;
 	char t[64] = {'\0'};
 	char k[64] = {'\0'};
@@ -141,7 +140,7 @@ auth_server_request(t_authresponse * authresponse, const char *request_type, con
         return (AUTH_ERROR);
     }else{
 		json_data = http_get_json_data(res);
-		json_parse(json_data,"code",(char *)&code,NULL);
+		json_parse(json_data,"code",(char *)&code);
 		
 		if (code != 0){
 			free(res);
@@ -149,7 +148,7 @@ auth_server_request(t_authresponse * authresponse, const char *request_type, con
 			return AUTH_ERROR ;
 		}
 
-		json_parse(json_data,"auth",&is_auth,NULL);
+		json_parse(json_data,"auth",&is_auth);
 		authresponse->authcode = is_auth;
 		free(res);
 		return authresponse->authcode ;

@@ -187,6 +187,7 @@ config_init(void)
 	memset(config.device_sn,0,sizeof(config.device_sn));
 	memset(config.device_base_mac,0,sizeof(config.device_base_mac));
 
+	config.auth_type.auth_type = 0;
 	config.auth_status = 0; /*default turn on the auth */
     config.gw_interface = NULL;
     config.gw_address = NULL;
@@ -1024,7 +1025,6 @@ validate_popular_servers(void)
     if (config.popular_servers == NULL) {
         debug(LOG_WARNING, "PopularServers not set in config file, this will become fatal in a future version.");
         add_popular_server("www.baidu.com");
-        add_popular_server("www.qq.com");
     }
 }
 

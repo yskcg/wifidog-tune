@@ -43,7 +43,7 @@ int json_parse_get_type_len(const char *json_input,const char *field,char * type
 
 }
 
-int json_parse(const char *json_input,const char *field,void * output,int * len)
+int json_parse(const char *json_input,const char *field,void * output)
 {
 	struct json_object *new_obj;
 	struct json_object *o = NULL;
@@ -79,10 +79,6 @@ int json_parse(const char *json_input,const char *field,void * output,int * len)
 		struct array_list *c_array = NULL;
 		
 		c_array = json_object_get_array(o);
-		
-		if (len != NULL){
-			*len = c_array->length;
-		}
 		
 		if(output){
 			for(i=0;i<c_array->length;i++){

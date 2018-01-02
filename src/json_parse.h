@@ -11,5 +11,5 @@
 #include "debug.h"
 
 extern int json_parse_get_type_len(const char *json_input,const char *field,char * type,int * len);
-extern int json_parse(const char *json_input,const char *field,void * output,int * len);
+extern int json_parse(const char *json_input,const char *field,void * output);
 #endif

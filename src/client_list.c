@@ -148,6 +148,8 @@ client_list_add(const char *ip, const char *mac, const char *token, const char *
     curclient->ip = safe_strdup(ip);
     curclient->mac = safe_strdup(mac);
     curclient->token = safe_strdup(token);
+	curclient->arp_flag = 0x2;
+	curclient->leave_net_time = (long)time(NULL);
     curclient->counters.incoming_delta = curclient->counters.outgoing_delta = 
             curclient->counters.incoming = curclient->counters.incoming_history = curclient->counters.outgoing =
         curclient->counters.outgoing_history = 0;

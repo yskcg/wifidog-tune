@@ -12,7 +12,13 @@ PKG_BUILD_DIR=$(PWD)
 CFLAGS= -O2 -Wall $(MYCFLAGS)  -fPIC $(MYLDFLAGS) $(DEFS) $(DEFAULT_INCLUDES)
 RM= rm -f
 #-Wl,-Bdynamic -lgcc_s
-LIBS= $(top_dir)/bin/libhttpd.a $(top_dir)/bin/libjson-c.a -ldl -lpthread $(MYLIBS) 
+
+#ifeq ($is_openwrt ,openwrt-linux)
+	LIBS= $(top_dir)/bin/libhttpd.a  $(top_dir)/bin/libjson-c.a  -Wl,-Bdynamic -ldl -Wl,-Bdynamic -lpthread $(MYLIBS)
+#else
+ #   LIBS= -ldl -lpthread $(MYLIBS) -static $(top_dir)/bin/libhttpd.a -static $(top_dir)/bin/libjson-c.a
+#endif
+
 
 MYLDFLAGS = -Wall -Wextra -Wno-unused-parameter
 EXTRA_CFLAGS +=
@@ -49,10 +55,10 @@ o:	$(ALL_O)
 
 
 $(WIFIDOG): $(WIFIDOG_O)  $(WIFIDOG_HEADERS)
-	@$(CC) -g -o $@  $(MYLDFLAGS) $(WIFIDOG_O) $(LIBS)
+	$(CC) -g -o $@  $(MYLDFLAGS) $(WIFIDOG_O) $(LIBS)
 
 $(WDCTL): $(WDCTL_O) $(WDCTL_HEADERS)
-	@$(CC) -g -o $@  $(MYLDFLAGS) $(WDCTL_O) $(LIBS)
+	$(CC) -g -o $@  $(MYLDFLAGS) $(WDCTL_O) $(LIBS)
 
 clean:
 	$(RM) $(ALL_T) $(ALL_O)

@@ -50,12 +50,14 @@ typedef struct _t_counters {
 typedef struct _t_client {
     struct _t_client *next;             /**< @brief Pointer to the next client */
     unsigned long long id;           /**< @brief Unique ID per client */
+	char arp_flag;					/*  arp_flags and at_flags field values  0x01:entry in use ;0x02:completed entry (enaddr valid);0x04:permanent entry;0x08:publish entry (respond for other host);0x10:has requested trailers;0x20:Do PROXY arp */
     char *ip;                           /**< @brief Client Ip address */
     char *mac;                          /**< @brief Client Mac address */
     char *token;                        /**< @brief Client token */
 	char uid[32];						/*the client phone number*/
 	long logon_time;			/*client log on timestamp*/
 	long logoff_time;			/*client log off timestamp*/
+	long leave_net_time;  		/*client leave network timestamp*/
     int fw_connection_state;     /**< @brief Connection state in the
 						     firewall */
     int fd;                             /**< @brief Client HTTP socket (valid only

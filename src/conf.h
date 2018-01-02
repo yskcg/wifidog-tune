@@ -153,6 +153,11 @@ typedef struct _popular_server_t {
     struct _popular_server_t *next;
 } t_popular_server;
 
+typedef struct {
+	char auth_type;
+	int expect_time;
+}_auth_info;
+
 /**
  * Configuration structure
  */
@@ -172,9 +177,9 @@ typedef struct {
     int gw_port;                /**< @brief Port the webserver will run on */
 	char device_sn[64];
 	char device_base_mac[32];
-	char gw_id[128];                /**< @brief ID of the Gateway, sent to central
-				     server */
+	char gw_id[128];                /**< @brief ID of the Gateway, sent to centralserver */
 	char auth_status;
+	_auth_info auth_type;
     t_auth_serv *auth_servers;  /**< @brief Auth servers list */
     char *httpdname;            /**< @brief Name the web server will return when
 				     replying to a request */

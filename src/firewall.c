@@ -58,6 +58,7 @@
 #include "client_list.h"
 #include "commandline.h"
 
+static int get_auth_info_times = 1;
 static int _fw_deny_raw(const char *ip, const char *mac, const int mark);
 
 /**
@@ -213,6 +214,38 @@ arp_get(const char *req_ip)
     return reply;
 }
 
+char arp_get_info(const char *mac)
+{
+	FILE *proc;
+    char ip[16];
+    char mac_arp[18];
+    char reply = -1;
+	unsigned int  flag;
+
+    s_config *config = config_get_config();
+
+    if (!(proc = fopen(config->arp_table_path, "r"))) {
+        return reply;
+    }
+
+    /* Skip first line */
+    while (!feof(proc) && fgetc(proc) != '\n') ;
+
+    /* Find ip, copy mac in reply */
+    while (!feof(proc) && (fscanf(proc, " %15[0-9.] %*s %x %17[A-Fa-f0-9:] %*s %*s", ip, &flag,mac_arp) == 3)) {
+        debug(LOG_NOTICE, "%s %d mac:%s mac_arp:%s\n",__FUNCTION__,__LINE__,mac,mac_arp);
+		if (strcmp(mac, mac_arp) == 0) {
+            reply = flag & 0xff;
+            break;
+        }
+    }
+
+    fclose(proc);
+
+    return reply;
+
+}
+
 /** Initialize the firewall rules
  */
 int
@@ -280,11 +313,13 @@ fw_destroy(void)
 void
 fw_sync_with_authserver(void)
 {
+	char arp_flag = 0;
     t_authresponse authresponse;
+	t_client *client = NULL;
     t_client *p1, *p2, *worklist, *tmp;
     s_config *config = config_get_config();
 
-    LOCK_CLIENT_LIST();
+	LOCK_CLIENT_LIST();
 
     /* XXX Ideally, from a thread safety PoV, this function should build a list of client pointers,
      * iterate over the list and have an explicit "client still valid" check while list is locked.
@@ -294,6 +329,15 @@ fw_sync_with_authserver(void)
     client_list_dup(&worklist);
     UNLOCK_CLIENT_LIST();
 
+	/*update the auth config*/
+	get_auth_info_times = get_auth_info_times +1 ;
+	if(get_auth_info_times >=1){
+		get_auth_info_times = 0;
+		get_auth_info();
+	}
+
+	debug(LOG_NOTICE, "%s %d get_auth_info_times:%d\n",__FUNCTION__,__LINE__,get_auth_info_times);
+
     for (p1 = p2 = worklist; NULL != p1; p1 = p2) {
         p2 = p1->next;
 
@@ -302,18 +346,58 @@ fw_sync_with_authserver(void)
          * way to deal witht his is to keep the DHCP lease time extremely
          * short:  Shorter than config->checkinterval * config->clienttimeout */
         icmp_ping(p1->ip);
+		arp_flag = arp_get_info(p1->mac);
+		time_t current_time = (long)time(NULL);
+		//*kick user auth_type:
+ 			//1:fix time;2:leave wifi time*/
+
+		LOCK_CLIENT_LIST();
+        client = client_list_find_by_mac(p1->mac);
+
+        if (client){
+			if(client->arp_flag != arp_flag ){
+				client->arp_flag = arp_flag;
+			}
+			debug(LOG_NOTICE, "%s %d current time:%d logon time:%d,expect time:%d\n",__FUNCTION__,__LINE__,current_time,client->logon_time,config->auth_type.expect_time);
+			if(config->auth_type.auth_type == 1){
+				if((current_time - client->logon_time) > config->auth_type.expect_time ){
+					debug(LOG_NOTICE, "%s - Denied. Removing client and firewall rules", client->ip);
+					fw_deny(client);
+					client_list_delete(client);
+					UNLOCK_CLIENT_LIST();
+					continue;
+				}
+			}else if (config->auth_type.auth_type == 2 && client->arp_flag != 0x2){
+				if((current_time - client->leave_net_time) > config->auth_type.expect_time ){
+					debug(LOG_NOTICE, "%s - Denied. Removing client and firewall rules", client->ip);
+					fw_deny(client);
+					client_list_delete(client);
+					UNLOCK_CLIENT_LIST();
+					continue;
+				}
+			}
+
+			if(client->arp_flag == 0x2){
+				UNLOCK_CLIENT_LIST();
+				client->leave_net_time = time(NULL);
+			}else{
+				UNLOCK_CLIENT_LIST();
+				debug(LOG_NOTICE, "don't request auth/auth api");
+				continue;       /* Next client please */
+			}
+        }else{
+			
+			UNLOCK_CLIENT_LIST();
+			debug(LOG_NOTICE, "Client was already removed. Skipping auth processing");
+			continue;       /* Next client please */
+		}
+
         /* Update the counters on the remote server only if we have an auth server */
         if (config->auth_servers != NULL) {
             auth_server_request(&authresponse, REQUEST_TYPE_COUNTERS, p1->ip, p1->mac, p1->token, p1->counters.incoming,
                                 p1->counters.outgoing, p1->counters.incoming_delta, p1->counters.outgoing_delta);
         }
 
-        time_t current_time = (long)time(NULL);
-        debug(LOG_INFO,
-              "Checking client %s for timeout:  Last updated %ld (%ld seconds ago), timeout delay %ld seconds, current time %ld, ",
-              p1->ip, p1->counters.last_updated, current_time - p1->counters.last_updated,
-              config->checkinterval * config->clienttimeout, current_time);
-       
 		/*
 		 * This handles any change in
 		 * the status this allows us
@@ -330,7 +414,6 @@ fw_sync_with_authserver(void)
 			debug(LOG_NOTICE, "Client was already removed. Skipping auth processing");
 			continue;       /* Next client please */
 		}
-
 		if (config->auth_servers != NULL) {
 			switch (authresponse.authcode) {
 			case AUTH_DENIED:
@@ -388,6 +471,5 @@ fw_sync_with_authserver(void)
 		}
 		UNLOCK_CLIENT_LIST();
     }
-
     client_list_destroy(worklist);
 }

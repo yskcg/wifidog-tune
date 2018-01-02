@@ -210,7 +210,8 @@ get_iface_mac(const char *ifname)
 {
     int r, s;
     struct ifreq ifr;
-    char *hwaddr, mac[13];
+    char *hwaddr, mac[18];
+	s_config *config = config_get_config();
 
     strncpy(ifr.ifr_name, ifname, 15);
     ifr.ifr_name[15] = '\0';
@@ -223,18 +224,19 @@ get_iface_mac(const char *ifname)
 
     r = ioctl(s, SIOCGIFHWADDR, &ifr);
     if (r == -1) {
-        debug(LOG_ERR, "get_iface_mac ioctl(SIOCGIFHWADDR): %s", strerror(errno));
+        debug(LOG_ERR, "get_iface_mac ioctl(SIOCGIFHWADDR): %s %s ", strerror(errno),ifname);
         close(s);
         return NULL;
     }
 
+	//debug(LOG_DEBUG, "%s %d size:%d device_sn:%s",__FUNCTION__,__LINE__,size,buf);
+
     hwaddr = ifr.ifr_hwaddr.sa_data;
     close(s);
-    snprintf(mac, sizeof(mac), "%02X%02X%02X%02X%02X%02X",
+    snprintf(config->device_base_mac, sizeof(mac), "%02X:%02X:%02X:%02X:%02X:%02X",
              hwaddr[0] & 0xFF,
              hwaddr[1] & 0xFF, hwaddr[2] & 0xFF, hwaddr[3] & 0xFF, hwaddr[4] & 0xFF, hwaddr[5] & 0xFF);
-
-    return safe_strdup(mac);
+	return NULL;
 }
 
 char *
@@ -479,15 +481,21 @@ static unsigned char get_device_gw_id_request()
        return 1;
     } else {
 		json_data = http_get_json_data(res);
-		json_parse(json_data,"code",(char*)&code,NULL);
+		json_parse(json_data,"code",(char*)&code);
 		
 		if (code != 0){
 			free(res);
 			return 1 ;
 		}else{
 			/*generate the gw_id*/
-			json_parse(json_data,"gw_id",config->gw_id,NULL);
-			json_parse(json_data,"is_auth",&config->auth_status,NULL);
+			json_parse(json_data,"gw_id",config->gw_id);
+			json_parse(json_data,"is_auth",&config->auth_status);
+			json_parse(json_data,"type",&config->auth_type.auth_type);
+			if(config->auth_type.auth_type ==1 ){
+				json_parse(json_data,"fixed",&config->auth_type.auth_type);
+			}else if(config->auth_type.auth_type ==2){
+				json_parse(json_data,"leave",&config->auth_type.auth_type);
+			}
 
 			if(config->gw_id && strlen(config->gw_id) >0 ){
 				free(res);
@@ -509,6 +517,82 @@ unsigned char get_device_gw_id(void)
 	}
 	
 	return 0;
+}
+
+unsigned char get_auth_info(void)
+{
+	 char request[MAX_BUF];
+    int sockfd;
+	char *json_data = NULL;
+    char t[64] = {'\0'};
+	char k[64] = {'\0'};
+	int  code = 0;
+
+	t_auth_serv *auth_server = NULL;
+
+	/*get the t and k value*/
+	build_t_key(t,k);
+	s_config *config = config_get_config();
+    auth_server = get_auth_server();
+
+    debug(LOG_DEBUG, "Entering get get_device_gw_id()");
+    memset(request, 0, sizeof(request));
+
+    sockfd = connect_auth_server();
+    if (sockfd == -1) {
+        return 1;
+    }
+
+    /*
+     * Prep & send request
+     */
+   snprintf(request, sizeof(request) - 1,
+             "GET /auth/config?gw_id=%s HTTP/1.0\r\n"
+			 "T: %s\r\n"
+			 "K: %s\r\n"
+             "User-Agent: WiFiDog %s\r\n"
+             "Host: %s\r\n"
+             "\r\n",
+             config_get_config()->gw_id,t,k,
+             VERSION, auth_server->authserv_hostname);
+    char *res;
+#ifdef USE_CYASSL
+    if (auth_server->authserv_use_ssl) {
+        res = https_get(sockfd, request, auth_server->authserv_hostname);
+    } else {
+        res = http_get(sockfd, request);
+    }
+#endif
+#ifndef USE_CYASSL
+    res = http_get(sockfd, request);
+#endif
+    if (NULL == res) {
+       return 1;
+    } else {
+		json_data = http_get_json_data(res);
+		json_parse(json_data,"code",(char*)&code);
+
+		if (code != 0){
+			free(res);
+			return 1 ;
+		}else{
+			/*get auth info*/
+			json_parse(json_data,"type",&config->auth_type.auth_type);
+			if(config->auth_type.auth_type ==1 ){
+				json_parse(json_data,"fixed",&config->auth_type.expect_time);
+			}else if(config->auth_type.auth_type ==2){
+				json_parse(json_data,"leave",&config->auth_type.expect_time);
+			}
+
+			free(res);
+			return 0;
+		}
+
+		free(res);
+		return 1;
+    }
+
+
 }
 
 /**

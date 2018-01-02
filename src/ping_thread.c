@@ -199,7 +199,7 @@ ping(void)
         }
     } else {
 		json_data = http_get_json_data(res);
-		json_parse(json_data,"code",(char *)&code,NULL);
+		json_parse(json_data,"code",(char *)&code);
 		
 		if (code != 0){
 			free(res);
@@ -210,10 +210,10 @@ ping(void)
 			return ;
 		}
 
-		json_parse(json_data,"result",&ret,NULL);
+		json_parse(json_data,"result",&ret);
 
 		if (ret){
-			json_parse(json_data,"is_auth",&is_auth,NULL);
+			json_parse(json_data,"is_auth",&is_auth);
 			
 			if(is_auth){
 				if (authdown) {
@@ -282,7 +282,6 @@ static void sync_white_black_list(void)
 	char *json_data = NULL;
     t_auth_serv *auth_server = NULL;
     auth_server = get_auth_server();
-	char *p_value = NULL;
 
     debug(LOG_DEBUG, "Entering sync white black list");
     memset(request, 0, sizeof(request));
@@ -327,17 +326,16 @@ static void sync_white_black_list(void)
 		return ;
     }else{
 		json_data = http_get_json_data(res);
-		json_parse(json_data,"code",(char *)&code,NULL);
+		json_parse(json_data,"code",(char *)&code);
 		
 		if (code != 0){
 			free(res);
 			return ;
 		}
 
-		json_parse(json_data,"version",(int *)&server_version,NULL);
+		json_parse(json_data,"version",(int *)&server_version);
 		
 		if( (server_version != version) && server_version != 0 ){
-			int len = 0;
 			char type = 0;
 			int i = 0;
 			
@@ -351,7 +349,7 @@ static void sync_white_black_list(void)
 					char mac_list[len][32];
 
 					memset(mac_list,0,sizeof(mac_list));
-					json_parse(json_data,"blacklist",mac_list,&len);
+					json_parse(json_data,"blacklist",mac_list);
 					
 					for(i=0;i<len;i++){
 						apply_white_black_list(mac_list[i],"blacklist");
@@ -372,7 +370,7 @@ static void sync_white_black_list(void)
 					char mac_list[len][32];
 
 					memset(mac_list,0,sizeof(mac_list));
-					json_parse(json_data,"whitelist",mac_list,&len);
+					json_parse(json_data,"whitelist",mac_list);
 					
 					for(i=0;i<len;i++){
 						apply_white_black_list(mac_list[i],"whitelist");

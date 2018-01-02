@@ -64,7 +64,6 @@ http_callback_404(httpd * webserver, request * r, int error_code)
 {
     char tmp_url[MAX_BUF], *url, *mac;
     s_config *config = config_get_config();
-    t_auth_serv *auth_server = get_auth_server();
 
     memset(tmp_url, 0, sizeof(tmp_url));
     /* 

@@ -99,4 +99,7 @@ unsigned char get_device_gw_id(void);
 /** get the t k value*/
 unsigned long int build_t_key(char *t,char *k);
 
+/* get the auth info*/
+unsigned char get_auth_info(void);
+
 #endif                          /* _UTIL_H_ */

@@ -1,0 +1,5 @@
+##WiFiDog build
+1. ingress the top dir ;
+2. edit the `Makefile`;
+3. edit the `MY_TARGET` variate to you wanted to ;
+4. save the file and  excute the command  `make` ;
