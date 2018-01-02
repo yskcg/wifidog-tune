@@ -233,7 +233,7 @@ char arp_get_info(const char *mac)
 
     /* Find ip, copy mac in reply */
     while (!feof(proc) && (fscanf(proc, " %15[0-9.] %*s %x %17[A-Fa-f0-9:] %*s %*s", ip, &flag,mac_arp) == 3)) {
-        debug(LOG_NOTICE, "%s %d mac:%s mac_arp:%s\n",__FUNCTION__,__LINE__,mac,mac_arp);
+        //debug(LOG_NOTICE, "%s %d mac:%s mac_arp:%s\n",__FUNCTION__,__LINE__,mac,mac_arp);
 		if (strcmp(mac, mac_arp) == 0) {
             reply = flag & 0xff;
             break;

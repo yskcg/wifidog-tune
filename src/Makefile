@@ -12,12 +12,11 @@ PKG_BUILD_DIR=$(PWD)
 CFLAGS= -O2 -Wall $(MYCFLAGS)  -fPIC $(MYLDFLAGS) $(DEFS) $(DEFAULT_INCLUDES)
 RM= rm -f
 #-Wl,-Bdynamic -lgcc_s
-
-#ifeq ($is_openwrt ,openwrt-linux)
+ifneq (,$(findstring openwrt-linux,$(CC)))
 	LIBS= $(top_dir)/bin/libhttpd.a  $(top_dir)/bin/libjson-c.a  -Wl,-Bdynamic -ldl -Wl,-Bdynamic -lpthread $(MYLIBS)
-#else
- #   LIBS= -ldl -lpthread $(MYLIBS) -static $(top_dir)/bin/libhttpd.a -static $(top_dir)/bin/libjson-c.a
-#endif
+else
+   LIBS= -ldl -lpthread $(MYLIBS) -static $(top_dir)/bin/libhttpd.a -static $(top_dir)/bin/libjson-c.a
+endif
 
 
 MYLDFLAGS = -Wall -Wextra -Wno-unused-parameter
