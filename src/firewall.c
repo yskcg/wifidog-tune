@@ -76,17 +76,11 @@ fw_allow(t_client * client, int new_fw_connection_state)
 
     int old_state = client->fw_connection_state;
 
-    debug(LOG_DEBUG, "Allowing %s %s with fw_connection_state %d", client->ip, client->mac, new_fw_connection_state);
+    debug(LOG_DEBUG, "Allowing %s %s with fw_connection_state %d old_state %d", client->ip, client->mac, new_fw_connection_state,old_state);
     client->fw_connection_state = new_fw_connection_state;
 
     /* Grant first */
     result = iptables_fw_access(FW_ACCESS_ALLOW, client->ip, client->mac, new_fw_connection_state);
-
-    /* Deny after if needed. */
-    if (old_state != FW_MARK_NONE) {
-        debug(LOG_DEBUG, "Clearing previous fw_connection_state %d", old_state);
-        _fw_deny_raw(client->ip, client->mac, old_state);
-    }
 
     return result;
 }
@@ -435,18 +429,6 @@ fw_sync_with_authserver(void)
 						  tmp->ip);
 					//WHY did we deny, then allow!?!? benoitg 2007-06-21
 					//fw_deny(tmp->ip, tmp->mac, tmp->fw_connection_state); /* XXX this was possibly to avoid dupes. */
-
-					if (tmp->fw_connection_state != FW_MARK_PROBATION) {
-						tmp->counters.incoming_delta =
-						 tmp->counters.outgoing_delta =
-						 tmp->counters.incoming =
-						 tmp->counters.outgoing = 0;
-					} else {
-						//We don't want to clear counters if the user was in validation, it probably already transmitted data..
-						debug(LOG_INFO,
-							  "%s - Skipped clearing counters after all, the user was previously in validation",
-							  tmp->ip);
-					}
 					fw_allow(tmp, FW_MARK_KNOWN);
 				}
 				break;
