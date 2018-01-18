@@ -7,6 +7,29 @@
 /* Define if .gnu.warning accepts long strings. */
 /* #undef HAS_GNU_WARNING_LONG */
 
+/* Define to 1 if you have the declaration of `INFINITY', and to 0 if you
+   don't. */
+#define HAVE_DECL_INFINITY 0
+
+/* Define to 1 if you have the declaration of `isinf', and to 0 if you don't.
+   */
+#define HAVE_DECL_ISINF 1
+
+/* Define to 1 if you have the declaration of `isnan', and to 0 if you don't.
+   */
+#define HAVE_DECL_ISNAN 1
+
+/* Define to 1 if you have the declaration of `nan', and to 0 if you don't. */
+#define HAVE_DECL_NAN 0
+
+/* Define to 1 if you have the declaration of `_finite', and to 0 if you
+   don't. */
+#define HAVE_DECL__FINITE 0
+
+/* Define to 1 if you have the declaration of `_isnan', and to 0 if you don't.
+   */
+#define HAVE_DECL__ISNAN 0
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
 
@@ -30,7 +53,7 @@
 
 /* Define to 1 if your system has a GNU libc compatible `malloc' function, and
    to 0 otherwise. */
-#define HAVE_MALLOC 1
+#define HAVE_MALLOC 0
 
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
@@ -40,7 +63,7 @@
 
 /* Define to 1 if your system has a GNU libc compatible `realloc' function,
    and to 0 otherwise. */
-#define HAVE_REALLOC 1
+#define HAVE_REALLOC 0
 
 /* Define to 1 if you have the `setlocale' function. */
 #define HAVE_SETLOCALE 1
@@ -143,10 +166,8 @@
 /* #undef const */
 
 /* Define to rpl_malloc if the replacement function should be used. */
-/* #undef malloc */
 
 /* Define to rpl_realloc if the replacement function should be used. */
-/* #undef realloc */
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
