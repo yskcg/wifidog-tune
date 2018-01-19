@@ -13,7 +13,7 @@ CFLAGS= -O2 -Wall -shared $(MYCFLAGS)  -fPIC $(MYLDFLAGS) $(DEFS) $(DEFAULT_INCL
 RM= rm -f
 LIBS= -lm $(MYLIBS)
 
-MYLDFLAGS = -Wall -Wextra -Wno-unused-parameter
+MYLDFLAGS = -Wall -Wextra -Wno-unused-parameter $(COROSS_TOOLS_PATH)
 EXTRA_CFLAGS +=
 MYLIBS=
 DEFS = -DHAVE_CONFIG_H
@@ -49,7 +49,7 @@ $(LIBHTTPD_A): $(LIBHTTP_CORE_O) $(LIBHTTP_HEADERS)
 	$(RANLIB) $@
 
 $(LIBHTTPD_SO): $(LIBHTTP_CORE_O) $(LIBHTTP_HEADERS)
-	$(CC) -o $@ -shared $? 
+	$(CC) -o $@ -shared $? $(COROSS_TOOLS_PATH) 
 
 install:$(LIBHTTP_HEADERS) $(ALL_SO)
 	@$(foreach list, $(LIBHTTP_HEADERS),`cp $(list) $(top_builddir)/include`)

@@ -13,12 +13,12 @@ CFLAGS= -O2 -Werror -Wwrite-strings -D_GNU_SOURCE -D_REENTRANT -shared $(MYCFLAG
 RM= rm -f
 LIBS= -lm $(MYLIBS)
 
-MYLDFLAGS = -Wall -Wextra -Wno-unused-parameter
+MYLDFLAGS = -Wall -Wextra -Wno-unused-parameter $(COROSS_TOOLS_PATH) 
 EXTRA_CFLAGS +=
 MYLIBS=
 DEFS = -DHAVE_CONFIG_H
 top_builddir = ..
-DEFAULT_INCLUDES = -I. -I$(top_builddir)
+DEFAULT_INCLUDES = -I. -I$(top_builddir) 
 # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
 
 PLATS= linux
@@ -49,7 +49,7 @@ $(LIBJSON_C_A):$(ALL_O) $(LIBJSON_C_HEADERS)
 	$(RANLIB) $@ 
 
 $(LIBJSON_C_SO): $(ALL_O)
-	$(CC) -o $@ -shared $? 
+	$(CC) -o $@ -shared $? $(COROSS_TOOLS_PATH)
 
 install:$(LIBJSON_C_HEADERS)
 	@$(foreach list, $(LIBJSON_C_HEADERS),`cp $(list) $(top_builddir)/include`)

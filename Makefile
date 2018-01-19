@@ -21,6 +21,7 @@
 #For rj h810g
 MY_TARGET=rj-h810-mips-linux
 TARGET_NAME=RJ-h810g
+export COROSS_TOOLS_PATH="--sysroot=/opt/rj-h810g/mips-linux-uclibc/"
 
 #MY_TARGET=i486-openwrt-linux
 #MY_TARGET=mipsel-openwrt-linux
@@ -34,9 +35,10 @@ export RANLIB = $(MY_TARGET)-ranlib
 export STRIP = $(MY_TARGET)-strip
 export AR = $(MY_TARGET)-ar
 
-COMPILE_TIME = $(shell date +"%Y-%M-%d-%H-%M-%S")
+
+COMPILE_TIME = $(shell date +"%Y-%m-%d-%H-%M-%S")
 ifneq (,$(TARGET_NAME))
-	output_name=$(TARGET_NAME)$(COMPILE_TIME)
+	output_name=$(TARGET_NAME)-$(COMPILE_TIME)
 else
 	output_name=openwrt-$(COMPILE_TIME)
 endif

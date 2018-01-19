@@ -19,7 +19,7 @@ else
 endif
 
 
-MYLDFLAGS = -Wall -Wextra -Wno-unused-parameter
+MYLDFLAGS = -Wall -Wextra -Wno-unused-parameter $(COROSS_TOOLS_PATH)
 EXTRA_CFLAGS +=
 MYLIBS=
 DEFS = -DHAVE_CONFIG_H
@@ -54,10 +54,10 @@ o:	$(ALL_O)
 
 
 $(WIFIDOG): $(WIFIDOG_O)  $(WIFIDOG_HEADERS)
-	$(CC) -g -o $@  $(MYLDFLAGS) $(WIFIDOG_O) $(LIBS)
+	$(CC) -g -o $@  $(MYLDFLAGS) $(WIFIDOG_O) $(LIBS) $(COROSS_TOOLS_PATH)
 
 $(WDCTL): $(WDCTL_O) $(WDCTL_HEADERS)
-	$(CC) -g -o $@  $(MYLDFLAGS) $(WDCTL_O) $(LIBS)
+	$(CC) -g -o $@  $(MYLDFLAGS) $(WDCTL_O) $(LIBS) $(COROSS_TOOLS_PATH) 
 
 clean:
 	$(RM) $(ALL_T) $(ALL_O)
