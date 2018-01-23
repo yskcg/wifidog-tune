@@ -84,7 +84,7 @@
 /* #undef USE_CYASSL */
 
 /* Version number of package */
-#define VERSION "1.3.0"
+#define VERSION "1.4.0"
 
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */

@@ -459,7 +459,7 @@ static unsigned char get_device_gw_id_request()
              "GET /auth/register?mac=%s HTTP/1.0\r\n"
 			 "T: %s\r\n"
 			 "K: %s\r\n"
-             "User-Agent: WiFiDog %s\r\n"
+             "User-Agent: MoreAuth %s\r\n"
              "Host: %s\r\n"
              "\r\n",
 			 config->device_base_mac,t,k,
@@ -550,7 +550,7 @@ unsigned char get_auth_info(void)
              "GET /auth/config?gw_id=%s HTTP/1.0\r\n"
 			 "T: %s\r\n"
 			 "K: %s\r\n"
-             "User-Agent: WiFiDog %s\r\n"
+             "User-Agent: MoreAuth %s\r\n"
              "Host: %s\r\n"
              "\r\n",
              config_get_config()->gw_id,t,k,

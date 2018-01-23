@@ -1,6 +1,6 @@
 #for hw hs8546
-#MY_TARGET=arm-linux
-#TARGET_NAME=HW-HS8546
+MY_TARGET=arm-linux
+TARGET_NAME=HW-HS8546
 
 #For zte F663N
 #MY_TARGET=mips-unknown-linux-uclibc
@@ -19,9 +19,9 @@
 #TARGET_NAME=RJ-SVG6000
 
 #For rj h810g
-MY_TARGET=rj-h810-mips-linux
-TARGET_NAME=RJ-h810g
-export COROSS_TOOLS_PATH="--sysroot=/opt/rj-h810g/mips-linux-uclibc/"
+#MY_TARGET=rj-h810-mips-linux
+#TARGET_NAME=RJ-h810g
+#export COROSS_TOOLS_PATH="--sysroot=/opt/rj-h810g/mips-linux-uclibc/"
 
 #MY_TARGET=i486-openwrt-linux
 #MY_TARGET=mipsel-openwrt-linux

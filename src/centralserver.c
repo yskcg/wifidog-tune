@@ -96,7 +96,7 @@ auth_server_request(t_authresponse * authresponse, const char *request_type, con
              "GET %s%sstage=%s&ip=%s&mac=%s&token=%s&incoming=%llu&outgoing=%llu&incomingdelta=%llu&outgoingdelta=%llu&gw_id=%s HTTP/1.0\r\n"
              "T: %s\r\n"
 			 "K: %s\r\n"
-			 "User-Agent: WiFiDog %s\r\n"
+			 "User-Agent: MoreAuth %s\r\n"
              "Host: %s\r\n"
              "\r\n",
              auth_server->authserv_path,
@@ -113,7 +113,7 @@ auth_server_request(t_authresponse * authresponse, const char *request_type, con
              "GET %s%sstage=%s&ip=%s&mac=%s&token=%s&incoming=%llu&outgoing=%llu&gw_id=%s HTTP/1.0\r\n"
              "T: %s\r\n"
 			 "K: %s\r\n"
-			 "User-Agent: WiFiDog %s\r\n"
+			 "User-Agent: MoreAuth %s\r\n"
              "Host: %s\r\n"
              "\r\n",
              auth_server->authserv_path,

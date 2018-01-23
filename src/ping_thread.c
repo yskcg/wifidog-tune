@@ -172,7 +172,7 @@ ping(void)
              "GET /auth/%sgw_id=%s&sys_uptime=%lu&sys_memfree=%u&sys_load=%.2f&wifidog_uptime=%lu HTTP/1.0\r\n"
 			 "T: %s\r\n"
 			 "K: %s\r\n"
-			 "User-Agent: WiFiDog %s\r\n"
+			 "User-Agent: MoreAuth %s\r\n"
              "Host: %s\r\n"
              "\r\n",
              auth_server->authserv_ping_script_path_fragment,config->gw_id,sys_uptime,sys_memfree,sys_load,(long unsigned int)((long unsigned int)time(NULL) - (long unsigned int)started_time),\
@@ -304,7 +304,7 @@ static void sync_white_black_list(void)
              "GET /auth/baw?gw_id=%s&v=%u HTTP/1.0\r\n"
 			 "T: %s\r\n"
 			 "K: %s\r\n"
-             "User-Agent: WiFiDog %s\r\n"
+             "User-Agent: MoreAuth %s\r\n"
              "Host: %s\r\n"
              "\r\n",
              config_get_config()->gw_id,
