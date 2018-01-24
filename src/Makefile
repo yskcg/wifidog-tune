@@ -63,10 +63,10 @@ clean:
 	$(RM) $(ALL_T) $(ALL_O)
 
 h_install:$(WIFIDOG_HEADERS)
-	@$(foreach list, $(WIFIDOG_HEADERS),`cp $(list) $(top_builddir)/include`)
+	@$(foreach list, $(WIFIDOG_HEADERS),`cp $(list) $(top_dir)/include`)
 
 install:$(LIBHTTP_HEADERS) $(ALL_SO)
-	@$(foreach list, $(ALL_T),`cp $(list) $(top_builddir)/bin`)
+	@$(foreach list, $(ALL_T),`cp $(list) $(top_dir)/bin`)
 
 depend:
 	@$(CC) $(CFLAGS) -MM l*.c print.c

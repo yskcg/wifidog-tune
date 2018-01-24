@@ -1,6 +1,6 @@
 #for hw hs8546
-MY_TARGET=arm-linux
-TARGET_NAME=HW-HS8546
+#MY_TARGET=arm-linux
+#TARGET_NAME=HW-HS8546
 
 #For zte F663N
 #MY_TARGET=mips-unknown-linux-uclibc
@@ -15,8 +15,8 @@ TARGET_NAME=HW-HS8546
 #TARGET_NAME=ZTE-860
 
 #For rj svg6000rw
-#MY_TARGET=rj-svg-mipsel-linux
-#TARGET_NAME=RJ-SVG6000
+MY_TARGET=rj-svg-mipsel-linux
+TARGET_NAME=RJ-SVG6000
 
 #For rj h810g
 #MY_TARGET=rj-h810-mips-linux
@@ -46,7 +46,7 @@ endif
 top_dir = $(PWD)
 export top_dir
 
-exclude_dirs := include bin doc  upgrade libpcap-1.5 scripts tcpdump-4.5
+exclude_dirs := include bin MoreAuth doc  upgrade libpcap-1.5 scripts tcpdump-4.5
 dirs := $(shell find . -maxdepth 1 -type d)
 
 dirs := $(basename $(patsubst ./%,%,$(dirs)))

@@ -58,7 +58,7 @@
 #include "debug.h"
 #include "pstring.h"
 
-#include "../config.h"
+#include "config.h"
 
 #include "simple_http.h"
 #include "conf.h"
@@ -78,7 +78,6 @@
 	debug(LOG_DEBUG, "wd_gethostbyname() unlocked"); \
 } while (0)
 
-#include "../config.h"
 #ifdef __ANDROID__
 #define WD_SHELL_PATH "/system/bin/sh"
 #else

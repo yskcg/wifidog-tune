@@ -44,7 +44,7 @@
 #include <signal.h>
 #include <errno.h>
 
-#include "../config.h"
+#include "config.h"
 #include "safe.h"
 #include "common.h"
 #include "conf.h"

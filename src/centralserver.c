@@ -49,7 +49,7 @@
 #include "debug.h"
 #include "centralserver.h"
 #include "firewall.h"
-#include "../config.h"
+#include "config.h"
 
 #include "simple_http.h"
 
