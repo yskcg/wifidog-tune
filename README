@@ -1,5 +1,5 @@
 ##WiFiDog build
 1. ingress the top dir ;
-2. edit the `Makefile`;
-3. edit the `MY_TARGET` variate to you wanted to ;
-4. save the file and  excute the command  `make` ;
+2. excute the shell script `./build.sh -l`,list the support product name;
+3. excute the shell script `./build.sh product name` will begine build the wifidog;
+4. when compile succed ,the result will be tar in dir `upgrade`;
