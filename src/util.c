@@ -58,7 +58,7 @@
 #include "debug.h"
 #include "pstring.h"
 
-#include "config.h"
+#include "wifidog_config.h"
 
 #include "simple_http.h"
 #include "conf.h"

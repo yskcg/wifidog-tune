@@ -18,7 +18,7 @@
 **
 */
 
-#include "config.h"
+#include "wifidog_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>

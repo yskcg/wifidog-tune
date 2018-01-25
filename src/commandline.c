@@ -35,7 +35,7 @@
 #include "conf.h"
 #include "commandline.h"
 
-#include "config.h"
+#include "wifidog_config.h"
 
 /*
  * Holds an argv that could be passed to exec*() if we restart ourselves

@@ -38,7 +38,7 @@
 
 #include "httpd.h"
 
-#include "config.h"
+#include "wifidog_config.h"
 #include "common.h"
 #include "debug.h"
 #include "httpd_thread.h"

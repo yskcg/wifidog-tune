@@ -44,7 +44,7 @@
 #include <signal.h>
 #include <errno.h>
 
-#include "config.h"
+#include "wifidog_config.h"
 #include "safe.h"
 #include "common.h"
 #include "conf.h"
@@ -204,26 +204,23 @@ ping(void)
 		if (code != 0){
 			free(res);
 			if (!authdown) {
-				fw_set_authdown();
-				authdown = 1;
+				authdown = fw_set_authdown();
 			}
 			return ;
 		}
 
 		json_parse(json_data,"result",&ret);
-
+		debug(LOG_ERR, "%s %d ret:%d !\n",__FUNCTION__,__LINE__,ret);
 		if (ret){
 			json_parse(json_data,"is_auth",&is_auth);
-			
+			debug(LOG_ERR, "%s %d is_auth:%d !\n",__FUNCTION__,__LINE__,is_auth);
 			if(is_auth){
 				if (authdown) {
-					fw_set_authup();
-					authdown = 0;
+					authdown = fw_set_authup();
 				}
 			}else{
 				if (!authdown) {
-					fw_set_authdown();
-					authdown = 1;
+					authdown = fw_set_authdown();
 				}
 			}
 

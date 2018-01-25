@@ -414,20 +414,23 @@ int
 iptables_fw_auth_unreachable(int tag)
 {
 	int ret = -1;
-	int rc = 1;
+	int rc ;
 	char *script;
 
     /*check the iptables rules exist*/
 	safe_asprintf(&script, "iptables -t nat -C %s -j ACCEPT", CHAIN_OUTGOING);
     iptables_insert_gateway_id(&script);
-    ret = system(script);
+    //ret = system(script);
+	ret = execute(script, fw_quiet);
+	debug(LOG_ERR, "%s %d ret:%d  %s !\n",__FUNCTION__,__LINE__,ret,script);
     free(script);
 
     if(ret != 0 ){
 	    rc = iptables_do_command("-t nat -I " CHAIN_OUTGOING " 1 -j ACCEPT");
+		return 1;
     }
 	
-	return rc;
+	return 0;
 }
 
 /** Remove mark when auth server is reachable again */
@@ -435,19 +438,22 @@ int
 iptables_fw_auth_reachable(void)
 {
 	int ret = -1;
-	int rc = 1;
+	int rc ;
 	char *script;
 
     /*check the iptables rules exist*/
 	safe_asprintf(&script, "iptables -t nat -C %s -j ACCEPT", CHAIN_OUTGOING);
     iptables_insert_gateway_id(&script);
-    ret = system(script);
+    //ret = system(script);
+	ret = execute(script, fw_quiet);
+	debug(LOG_ERR, "%s %d ret:%d  %s !\n",__FUNCTION__,__LINE__,ret,script);
     free(script);
-
+	
     if(ret == 0 ){
 	    rc = iptables_do_command("-t nat -D " CHAIN_OUTGOING " -j ACCEPT");
+		return rc;
     }
 
-	return rc;
+	return 1;
 }
 

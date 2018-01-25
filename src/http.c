@@ -55,7 +55,7 @@
 #include "util.h"
 #include "wd_util.h"
 
-#include "config.h"
+#include "wifidog_config.h"
 
 
 /** The 404 handler is also responsible for redirecting to the auth server */

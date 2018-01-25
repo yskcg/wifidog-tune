@@ -45,7 +45,7 @@
 #include "debug.h"
 #include "pstring.h"
 
-#include "config.h"
+#include "wifidog_config.h"
 
 /* XXX Do these need to be locked ? */
 static time_t last_online_time = 0;
