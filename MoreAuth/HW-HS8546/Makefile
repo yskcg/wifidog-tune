@@ -38,15 +38,15 @@ export AR = $(MY_TARGET)-ar
 
 COMPILE_TIME = $(shell date +"%Y-%m-%d-%H-%M-%S")
 ifneq (,$(TARGET_NAME))
-	output_name=$(TARGET_NAME)-$(COMPILE_TIME)
+	output_name=$(TARGET_NAME)-v$(WIFIDOG_VERSION)-$(COMPILE_TIME)
 else
-	output_name=openwrt-$(COMPILE_TIME)
+	output_name=openwrt-v$(WIFIDOG_VERSION)-$(COMPILE_TIME)
 endif
 
 top_dir = $(PWD)/
 export top_dir
 
-exclude_dirs := include bin MoreAuth doc  upgrade libpcap-1.5 scripts tcpdump-4.5
+exclude_dirs := install include bin MoreAuth doc  upgrade libpcap-1.5 scripts tcpdump-4.5
 dirs := $(shell find . -maxdepth 1 -type d)
 
 dirs := $(basename $(patsubst ./%,%,$(dirs)))
@@ -78,6 +78,7 @@ $(clean_dirs):
 clean: $(clean_dirs)    
 	rm -rf bin
 	rm -rf include
+	rm -rf install	
 
 install:
 	@mkdir -p install

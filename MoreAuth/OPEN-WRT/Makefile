@@ -15,16 +15,17 @@
 #TARGET_NAME=ZTE-860
 
 #For rj svg6000rw
-MY_TARGET=rj-svg-mipsel-linux
-TARGET_NAME=RJ-SVG6000
+#MY_TARGET=rj-svg-mipsel-linux
+#TARGET_NAME=RJ-SVG6000
 
 #For rj h810g
 #MY_TARGET=rj-h810-mips-linux
 #TARGET_NAME=RJ-h810g
 #export COROSS_TOOLS_PATH="--sysroot=/opt/rj-h810g/mips-linux-uclibc/"
 
-#MY_TARGET=i486-openwrt-linux
+MY_TARGET=i486-openwrt-linux
 #MY_TARGET=mipsel-openwrt-linux
+
 export CC=$(MY_TARGET)-gcc
 export AR=$(MY_TARGET)-ar
 export CPP=$(MY_TARGET) -E
@@ -43,7 +44,7 @@ else
 	output_name=openwrt-v$(WIFIDOG_VERSION)-$(COMPILE_TIME)
 endif
 
-top_dir = $(PWD)
+top_dir = $(PWD)/
 export top_dir
 
 exclude_dirs := install include bin MoreAuth doc  upgrade libpcap-1.5 scripts tcpdump-4.5
@@ -78,7 +79,7 @@ $(clean_dirs):
 clean: $(clean_dirs)    
 	rm -rf bin
 	rm -rf include
-	rm -rf install	
+	rm -rf install
 
 install:
 	@mkdir -p install

@@ -29,10 +29,12 @@ prepare_build(){
 	pushd ${product_dir} >/dev/null
 
 	if [ -d "${product_dir}/$1" ];then
-		rm -rf ${topdir}/Makefile ${topdir}/wifidog.conf ${topdir}/wifidog-msg.html
+		rm -rf ${topdir}/Makefile ${topdir}/wifidog.conf ${topdir}/wifidog-msg.html  ${topdir}/wifidog_config.h
 		cp -f ${product_dir}/$1/* ${topdir}
+		export WIFIDOG_VERSION=`sed -n '/ VERSION/p' ${product_dir}/$1/wifidog_config.h | awk '{print $3 }' | sed 's/"//g' | xargs echo -n `
 	else
 		echo "invaild product name $1"
+		exit 1
 	fi
 
 	popd  >/dev/null
