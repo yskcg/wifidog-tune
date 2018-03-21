@@ -510,13 +510,18 @@ main_loop(void)
     }
     pthread_detach(tid);
 
+	
     /* Start heartbeat thread */
-    result = pthread_create(&tid_ping, NULL, (void *)thread_ping, NULL);
-    if (result != 0) {
-        debug(LOG_ERR, "FATAL: Failed to create a new thread (ping) - exiting");
-        termination_handler(0);
-    }
-    pthread_detach(tid_ping);
+    //result = pthread_create(&tid_ping, NULL, (void *)thread_ping, NULL);
+    //if (result != 0) {
+        //debug(LOG_ERR, "FATAL: Failed to create a new thread (ping) - exiting");
+        //termination_handler(0);
+    //}
+    //pthread_detach(tid_ping);
+
+	eloop_register_timeout(config_get_config()->checkinterval, 0,ping,NULL, NULL);
+
+
 
     debug(LOG_NOTICE, "Waiting for connections");
     while (1) {

@@ -95,8 +95,7 @@ thread_ping(void *arg)
 /** @internal
  * This function does the actual request.
  */
-static void
-ping(void)
+static void ping(void *eloop_ctx,void *timeout_ctx )
 {
     char request[MAX_BUF];
     FILE *fh;
