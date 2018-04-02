@@ -370,6 +370,12 @@ int eloop_register_timeout(unsigned int secs, unsigned int usecs,eloop_timeout_h
 	return 0;
 }
 
+int eloop_cancel_timeout(struct eloop_timeout *timeout)
+{
+	dl_list_del(&timeout->list);
+	os_free(timeout);
+}
+
 int eloop_cancel_timeout(eloop_timeout_handler handler,void *eloop_data, void *user_data)
 {
 	dl_list_del(&timeout->list);
@@ -401,8 +407,7 @@ int epoll_run()
 		int n;
 		struct eloop_timeout *timeout;
 		
-		timeout = dl_list_first(&eloop.timeout, struct eloop_timeout,
-					list);
+		timeout = dl_list_first(&eloop.timeout, struct eloop_timeout,list);
 		if (timeout) {
 			os_get_reltime(&now);
 			if (os_reltime_before(&now, &timeout->time)){
@@ -439,15 +444,6 @@ int epoll_run()
 		if (n <= 0){
 			continue;
 		}
-
-		//for (i = 0;i<n;i++){
-			//if (events[i].data.fd == genl_fd){
-				//ret = genl_rcv_msg(family_id, events[i].data.fd);
-				//if(ret <0 ){
-					//epoll_ctl(epoll_fd, EPOLL_CTL_DEL, events[i].data.fd,&event);
-				//}
-			//}
-		//}
 
 		eloop_sock_table_dispatch(eloop.epoll_events, n);
 		

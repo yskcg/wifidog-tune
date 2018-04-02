@@ -495,12 +495,13 @@ main_loop(void)
 
 	get_device_gw_id();
     /* Start clean up thread */
-    result = pthread_create(&tid_fw_counter, NULL, (void *)thread_client_timeout_check, NULL);
-    if (result != 0) {
-        debug(LOG_ERR, "FATAL: Failed to create a new thread (fw_counter) - exiting");
-        termination_handler(0);
-    }
-    pthread_detach(tid_fw_counter);
+    eloop_register_timeout(config_get_config()->checkinterval, 0,fw_sync_with_authserver,NULL, NULL)
+    //result = pthread_create(&tid_fw_counter, NULL, (void *)thread_client_timeout_check, NULL);
+    //if (result != 0) {
+    //    debug(LOG_ERR, "FATAL: Failed to create a new thread (fw_counter) - exiting");
+    //    termination_handler(0);
+    //}
+    //pthread_detach(tid_fw_counter);
 
     /* Start control thread */
     result = pthread_create(&tid, NULL, (void *)thread_wdctl, (void *)safe_strdup(config->wdctl_sock));

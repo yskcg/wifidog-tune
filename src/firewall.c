@@ -304,8 +304,7 @@ fw_destroy(void)
 /**Probably a misnomer, this function actually refreshes the entire client list's traffic counter, re-authenticates every client with the central server and update's the central servers traffic counters and notifies it if a client has logged-out.
  * @todo Make this function smaller and use sub-fonctions
  */
-void
-fw_sync_with_authserver(void)
+void *fw_sync_with_authserver(void *eloop_data, void *user_ctx)
 {
 	char arp_flag = 0;
     t_authresponse authresponse;

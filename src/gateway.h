@@ -32,6 +32,7 @@
 #include <ctype.h>
 
 #include "httpd.h"
+#include "util.h"
 
 
 extern time_t started_time;

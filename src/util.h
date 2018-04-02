@@ -49,6 +49,7 @@
 #include <netdb.h>
 #include <sys/time.h>
 
+#include  "eloop.h"
 #include "md5.h"
 
 #define FH_DEVICESN "/tmp/gram/wifidog/fh_devicesn"
