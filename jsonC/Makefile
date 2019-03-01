@@ -25,8 +25,8 @@ PLATS= linux
 
 LIBJSON_C_A= libjson-c.a
 LIBJSON_C_SO= libjson-c.so
-CORE_O=cJSON.o json_parse.o
-LIBJSON_C_HEADERS= cJSON.h json_parse.h
+CORE_O=cJSON.o cjson_parse.o
+LIBJSON_C_HEADERS= cJSON.h cjson_parse.h
 LIB_O=
 
 ALL_O= $(CORE_O)
@@ -78,17 +78,6 @@ linux:
 	$(MAKE) all MYLIBS="-Wl,-E -ldl"
 
 # DO NOT DELETE
-
-arraylist.o:$(LIBJSON_C_HEADERS)
-debug.o: $(LIBJSON_C_HEADERS)
-json_c_version.o: $(LIBJSON_C_HEADERS)
-json_object.o: $(LIBJSON_C_HEADERS)
-json_object_iterator.o: $(LIBJSON_C_HEADERS)
-json_tokener.o: $(LIBJSON_C_HEADERS)
-json_util.o: $(LIBJSON_C_HEADERS)
-linkhash.o: $(LIBJSON_C_HEADERS)
-printbuf.o: $(LIBJSON_C_HEADERS)
-random_seed.o: $(LIBJSON_C_HEADERS)
 cJSON.o:$(LIBJSON_C_HEADERS)
-json_parse.o: $(LIBJSON_C_HEADERS)
+cjson_parse.o: $(LIBJSON_C_HEADERS)
 # (end of Makefile)

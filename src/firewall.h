@@ -68,7 +68,7 @@ int fw_set_authdown(void);
 int fw_set_authup(void);
 
 /** @brief Refreshes the entire client list */
-void fw_sync_with_authserver(void);
+void fw_sync_with_authserver(void *eloop_data, void *user_ctx);
 
 /** @brief Get an IP's MAC address from the ARP cache.*/
 char *arp_get(const char *);

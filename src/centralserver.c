@@ -140,7 +140,7 @@ auth_server_request(t_authresponse * authresponse, const char *request_type, con
         return (AUTH_ERROR);
     }else{
 		json_data = http_get_json_data(res);
-		json_parse(json_data,"code",(char *)&code);
+		cjson_parse(json_data,"code",(char *)&code);
 		
 		if (code != 0){
 			free(res);
@@ -148,7 +148,7 @@ auth_server_request(t_authresponse * authresponse, const char *request_type, con
 			return AUTH_ERROR ;
 		}
 
-		json_parse(json_data,"auth",&is_auth);
+		cjson_parse(json_data,"auth",&is_auth);
 		authresponse->authcode = is_auth;
 		free(res);
 		return authresponse->authcode ;

@@ -198,7 +198,7 @@ httpdCreate(host, port)
 char *host;
 int port;
 {
-    httpd *new;
+    httpd *new = NULL;
     int sock, opt;
     struct sockaddr_in addr;
 

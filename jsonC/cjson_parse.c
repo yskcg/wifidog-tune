@@ -1,6 +1,6 @@
-﻿#include "./json_parse.h"
+﻿#include "./cjson_parse.h"
 
-int json_parse_get_type_len(const char *json_input,const char *field,char * type,int * len)
+int cjson_parse_get_type_len(const char *json_input,const char *field,char * type,int * len)
 {
     const cJSON *name = NULL;
     int status = 0;
@@ -36,7 +36,7 @@ int json_parse_get_type_len(const char *json_input,const char *field,char * type
     return status;
 }
 
-char json_parse(const char * json_input,const char *field,void * output)
+char cjson_parse(const char * json_input,const char *field,void * output)
 {
     const cJSON *name = NULL;
     int status = 0;

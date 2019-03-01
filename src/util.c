@@ -64,7 +64,7 @@
 #include "conf.h"
 #include "centralserver.h"
 #include "http_json.h"
-#include "json_parse.h"
+#include "cjson_parse.h"
 
 #define LOCK_GHBN() do { \
 	debug(LOG_DEBUG, "Locking wd_gethostbyname()"); \
@@ -480,20 +480,20 @@ static unsigned char get_device_gw_id_request()
        return 1;
     } else {
 		json_data = http_get_json_data(res);
-		json_parse(json_data,"code",(char*)&code);
+		cjson_parse(json_data,"code",(char*)&code);
 		
 		if (code != 0){
 			free(res);
 			return 1 ;
 		}else{
 			/*generate the gw_id*/
-			json_parse(json_data,"gw_id",config->gw_id);
-			json_parse(json_data,"is_auth",&config->auth_status);
-			json_parse(json_data,"type",&config->auth_type.auth_type);
+			cjson_parse(json_data,"gw_id",config->gw_id);
+			cjson_parse(json_data,"is_auth",&config->auth_status);
+			cjson_parse(json_data,"type",&config->auth_type.auth_type);
 			if(config->auth_type.auth_type ==1 ){
-				json_parse(json_data,"fixed",&config->auth_type.auth_type);
+				cjson_parse(json_data,"fixed",&config->auth_type.auth_type);
 			}else if(config->auth_type.auth_type ==2){
-				json_parse(json_data,"leave",&config->auth_type.auth_type);
+				cjson_parse(json_data,"leave",&config->auth_type.auth_type);
 			}
 
 			if(config->gw_id && strlen(config->gw_id) >0 ){
@@ -569,18 +569,18 @@ unsigned char get_auth_info(void)
        return 1;
     } else {
 		json_data = http_get_json_data(res);
-		json_parse(json_data,"code",(char*)&code);
+		cjson_parse(json_data,"code",(char*)&code);
 
 		if (code != 0){
 			free(res);
 			return 1 ;
 		}else{
 			/*get auth info*/
-			json_parse(json_data,"type",&config->auth_type.auth_type);
+			cjson_parse(json_data,"type",&config->auth_type.auth_type);
 			if(config->auth_type.auth_type ==1 ){
-				json_parse(json_data,"fixed",&config->auth_type.expect_time);
+				cjson_parse(json_data,"fixed",&config->auth_type.expect_time);
 			}else if(config->auth_type.auth_type ==2){
-				json_parse(json_data,"leave",&config->auth_type.expect_time);
+				cjson_parse(json_data,"leave",&config->auth_type.expect_time);
 			}
 
 			free(res);
