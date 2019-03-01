@@ -25,9 +25,8 @@ PLATS= linux
 
 LIBJSON_C_A= libjson-c.a
 LIBJSON_C_SO= libjson-c.so
-CORE_O=	arraylist.o debug.o json_c_version.o json_object.o json_object_iterator.o json_tokener.o json_util.o linkhash.o printbuf.o random_seed.o
-LIBJSON_C_HEADERS= config.h json_config.h arraylist.h bits.h debug.h json.h json_config.h json_c_version.h json_inttypes.h json_object.h \
-					json_object_iterator.h json_object_private.h json_tokener.h json_util.h linkhash.h printbuf.h random_seed.h
+CORE_O=cJSON.o json_parse.o
+LIBJSON_C_HEADERS= cJSON.h json_parse.h
 LIB_O=
 
 ALL_O= $(CORE_O)
@@ -90,5 +89,6 @@ json_util.o: $(LIBJSON_C_HEADERS)
 linkhash.o: $(LIBJSON_C_HEADERS)
 printbuf.o: $(LIBJSON_C_HEADERS)
 random_seed.o: $(LIBJSON_C_HEADERS)
-
+cJSON.o:$(LIBJSON_C_HEADERS)
+json_parse.o: $(LIBJSON_C_HEADERS)
 # (end of Makefile)

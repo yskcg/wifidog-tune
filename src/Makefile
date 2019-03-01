@@ -28,11 +28,11 @@ DEFAULT_INCLUDES = -I. -I$(top_dir) -I$(top_dir)/include
 # USE_READLINE=1
 
 CORE_O=	main.o auth.o centralserver.o client_list.o commandline.o conf.o debug.o firewall.o fw_iptables.o gateway.o \
-		http.o httpd_thread.o  ping_thread.o pstring.o safe.o simple_http.o util.o  wdctl_thread.o json_parse.o http_json.o md5.o\
+		http.o httpd_thread.o  ping_thread.o pstring.o safe.o simple_http.o util.o  wdctl_thread.o  http_json.o md5.o\
 		wd_util.o
 LIB_O=
 
-WIFIDOG_HEADERS=auth.h centralserver.h client_list.h commandline.h common.h conf.h debug.h firewall.h fw_iptables.h json_parse.h \
+WIFIDOG_HEADERS=auth.h centralserver.h client_list.h commandline.h common.h conf.h debug.h firewall.h fw_iptables.h \
 				gateway.h httpd_thread.h http.h ping_thread.h pstring.h safe.h simple_http.h util.h wdctl.h wdctl_thread.h wd_util.h \
 				http_json.h md5.h
 
