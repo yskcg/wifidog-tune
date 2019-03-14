@@ -1,6 +1,7 @@
 #ifndef __H_ROAM_ELOOP_H
 #define __H_ROAM_ELOOP_H
 
+#include <sys/epoll.h>
 #include "util.h"
 #include "list.h"
 

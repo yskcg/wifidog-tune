@@ -29,7 +29,7 @@
 #define _PING_THREAD_H_
 
 #include "http_json.h"
-#include "json_parse.h"
+#include "cjson_parse.h"
 #include "fw_iptables.h"
 
 #define MINIMUM_STARTED_TIME 1041379200 /* 2003-01-01 */
