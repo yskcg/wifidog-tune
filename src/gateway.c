@@ -520,7 +520,7 @@ main_loop(void)
     //}
     //pthread_detach(tid_ping);
 
-	eloop_register_timeout(config_get_config()->checkinterval, 0,ping,NULL, NULL);
+	//eloop_register_timeout(config_get_config()->checkinterval, 0,ping,NULL, NULL);
 
 
 

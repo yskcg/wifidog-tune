@@ -57,7 +57,6 @@
 #include "simple_http.h"
 
 static int version = 0;
-static void ping(void);
 static void sync_white_black_list(void);
 
 /** Launches a thread that periodically checks in with the wifidog auth server to perform heartbeat function.
@@ -338,7 +337,7 @@ static void sync_white_black_list(void)
 			version = server_version;
 			json_parse_get_type_len(json_data,"blacklist",&type,&len);
 
-			if(type == json_type_array && len >=0){
+			if(type == cJSON_Array && len >=0){
 				iptables_fw_clear_black_list();
 				
 				if(len >0){
