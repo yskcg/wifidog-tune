@@ -358,7 +358,7 @@ static void sync_white_black_list(void)
 
 			cjson_parse_get_type_len(json_data,"whitelist",&type,&len);
 
-			if(type == json_type_array && len >=0){
+			if(type == cJSON_Array && len >=0){
 				iptables_fw_clear_white_list();
 				
 				if(len >0){
